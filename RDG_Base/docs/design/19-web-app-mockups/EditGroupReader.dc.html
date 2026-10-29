@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Group, read only</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#F5F5F5;font-family:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,sans-serif;color:#242424}
+a{color:#0F6CBD}a:hover{color:#0C3B5E}
+.nav a{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:6px;color:#242424;text-decoration:none;font-size:14px}
+.nav a:hover{background:#F0F0F0;color:#242424}
+.nav a.on{background:#EBF3FC;color:#0F548C;font-weight:600}
+.card{background:#fff;border:1px solid #E0E0E0;border-radius:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:4px;border:1px solid #D1D1D1;background:#fff;color:#242424;font:inherit;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.ok{background:#F1FAF1;color:#0E700E}
+.info{background:#EBF3FC;color:#0F548C}
+.muted{color:#616161}
+dl{display:grid;grid-template-columns:180px 1fr;gap:10px 16px;margin:0;font-size:14px}
+dt{color:#616161}
+dd{margin:0}
+.code{font-family:"Cascadia Code",Consolas,ui-monospace,monospace;font-size:13px;line-height:22px}
+.p{color:#0F548C}.o{color:#7A2E8E}.s{color:#0E700E}
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-direction: column">
+<header style="display: flex; align-items: center; justify-content: space-between; height: 48px; padding: 0 20px; background: #0F6CBD; color: #ffffff">
+<div style="display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5"></path><path d="M16 4.5a3.5 3.5 0 0 1 0 7"></path><path d="M18.5 13.8c1.8.9 3 2.9 3 6.2"></path></svg>
+<span>Dynamic Groups</span>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; font-size: 13px"><span>Reader</span><span style="width: 28px; height: 28px; border-radius: 50%; background: #ffffff; color: #0F548C; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 12px">SD</span></div>
+</header>
+<div style="display: flex; flex-wrap: wrap; flex: 1">
+<nav class="nav" aria-label="Main" style="flex: 1 1 220px; padding: 16px 12px; background: #FAFAFA; border-right: 1px solid #E0E0E0; display: flex; flex-direction: column; gap: 2px; box-sizing: border-box">
+<a class="on" href="Main.dc.html">Groups</a>
+<a href="Activity.dc.html">Activity</a>
+<a href="Audit.dc.html">Audit</a>
+<a href="Settings.dc.html">Settings</a>
+</nav>
+<main style="flex: 999 1 560px; min-width: 0; padding: 24px 32px 40px; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box">
+<div style="font-size: 13px"><a href="Main.dc.html">Groups</a> <span class="muted">/ EOP Strict – Management</span></div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
+<h1 style="margin: 0; font-size: 24px; font-weight: 600">EOP Strict – Management</h1>
+<span class="badge info">Mail-enabled security</span>
+<span class="badge ok"><span class="dot"></span>OK</span>
+</div>
+<div style="background: #EBF3FC; color: #0F548C; border-radius: 6px; padding: 10px 14px; font-size: 14px">You have read access. Ask an admin to change this group.</div>
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+<div style="flex: 2 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+<section class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Settings of this group</h2>
+<dl>
+<dt>Target group</dt><dd>MESG-EOP-Strict · mesg-eop-strict@contoso.org</dd>
+<dt>Frequency</dt><dd>15 min</dd>
+<dt>Enabled</dt><dd>Yes</dd>
+<dt>Dry run</dt><dd>Off</dd>
+<dt>Always include</dt><dd>Lea Keller</dd>
+<dt>Always exclude</dt><dd>svc-backup</dd>
+<dt>Disabled accounts, guests</dt><dd>Excluded</dd>
+<dt>Change limit</dt><dd>Organisation default (50 %)</dd>
+</dl>
+</section>
+<section class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Rule</h2>
+<div class="code" style="border: 1px solid #E0E0E0; border-radius: 4px; background: #FAFAFA; padding: 10px 12px; display: grid; grid-template-columns: 28px 1fr; column-gap: 12px">
+<span class="muted" style="text-align: right">1</span><span>(<span class="p">user.extensionAttribute3</span> <span class="o">-in</span> [<span class="s">"STIFTRAT"</span>,<span class="s">"DIR1"</span>,<span class="s">"DIR2"</span>,<span class="s">"KOM"</span>,<span class="s">"GPK"</span>]) <span class="o">-or</span></span>
+<span class="muted" style="text-align: right">2</span><span>(<span class="p">user.extensionAttribute3</span> <span class="o">-startsWith</span> <span class="s">"SRV"</span>) <span class="o">-or</span></span>
+<span class="muted" style="text-align: right">3</span><span>(<span class="p">user.memberof</span> <span class="o">-any</span> (<span class="p">group.objectId</span> <span class="o">-in</span> [<span class="s">'7c1e…a4f2'</span>]))</span>
+</div>
+<button class="btn" type="button" style="align-self: flex-start">Copy rule</button>
+</section>
+</div>
+<div style="flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+<section class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Status</h2>
+<dl style="grid-template-columns: 110px 1fr"><dt>Last result</dt><dd><span class="badge ok"><span class="dot"></span>OK</span></dd><dt>Members</dt><dd>42</dd><dt>Last sync</dt><dd>Today 10:15</dd><dt>Last run</dt><dd>+1 / −0</dd></dl>
+<a href="Activity.dc.html" style="font-size: 14px">View runs of this group</a>
+</section>
+<section class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: center"><h2 style="margin: 0; font-size: 16px; font-weight: 600">Preview</h2><button class="btn" type="button">Run preview</button></div>
+<p class="muted" style="margin: 0; font-size: 14px">Readers can run previews; nothing is changed.</p>
+</section>
+</div>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1060}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

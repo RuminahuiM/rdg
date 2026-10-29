@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Approve change once</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;font-family:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,sans-serif;color:#242424}
+a{color:#0F6CBD}a:hover{color:#0C3B5E}
+.btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 14px;border-radius:4px;border:1px solid #D1D1D1;background:#fff;color:#242424;font:inherit;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.btn.primary{background:#0F6CBD;border-color:#0F6CBD;color:#fff}
+.muted{color:#616161}
+.stat{background:#FAFAFA;border-radius:6px;padding:12px;text-align:center}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; position: relative; background: #F5F5F5; overflow: hidden">
+<div style="height: 48px; background: #0F6CBD"></div>
+<div style="display: flex; height: 852px">
+<div style="width: 220px; background: #FAFAFA; border-right: 1px solid #E0E0E0"></div>
+<div style="flex: 1; padding: 24px 32px; display: flex; flex-direction: column; gap: 16px">
+<div style="height: 28px; width: 320px; background: #E6E6E6; border-radius: 4px"></div>
+<div style="height: 420px; background: #ffffff; border: 1px solid #E0E0E0; border-radius: 8px"></div>
+</div>
+</div>
+<div style="position: absolute; inset: 0; background: rgba(0, 0, 0, 0.4); display: flex; align-items: center; justify-content: center">
+<div role="dialog" aria-modal="true" aria-labelledby="ap-title" style="width: 560px; background: #ffffff; border-radius: 8px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.24); padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<div>
+<h2 id="ap-title" style="margin: 0; font-size: 20px; font-weight: 600">Approve this change once</h2>
+<p class="muted" style="margin: 4px 0 0; font-size: 14px">Intune – Field Laptops · blocked by the change limit at 10:15</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+<div class="stat"><div style="font-size: 22px; font-weight: 600; color: #0E700E">+88</div><div class="muted" style="font-size: 12px">to add</div></div>
+<div class="stat"><div style="font-size: 22px; font-weight: 600">0</div><div class="muted" style="font-size: 12px">to remove</div></div>
+<div class="stat"><div style="font-size: 22px; font-weight: 600; color: #B10E1C">59 %</div><div class="muted" style="font-size: 12px">of 150 members</div></div>
+<div class="stat"><div style="font-size: 22px; font-weight: 600">50 %</div><div class="muted" style="font-size: 12px">limit</div></div>
+</div>
+<div style="font-size: 14px; display: flex; flex-direction: column; gap: 6px">
+<div style="font-weight: 600">Users to add (first 5 of 88)</div>
+<div style="display: flex; justify-content: space-between"><span>Nina Frei</span><span class="muted">extensionAttribute5 = FIELD-OPS</span></div>
+<div style="display: flex; justify-content: space-between"><span>Tom Bachmann</span><span class="muted">extensionAttribute5 = FIELD-OPS</span></div>
+<div style="display: flex; justify-content: space-between"><span>Sara Meier</span><span class="muted">extensionAttribute5 = FIELD-LOG</span></div>
+<div style="display: flex; justify-content: space-between"><span>Jonas Huber</span><span class="muted">extensionAttribute5 = FIELD-LOG</span></div>
+<div style="display: flex; justify-content: space-between"><span>Elif Kaya</span><span class="muted">extensionAttribute5 = FIELD-OPS</span></div>
+<a href="#all" style="font-size: 13px">Show all 88 users</a>
+</div>
+<div style="background: #EBF3FC; color: #0F548C; border-radius: 6px; padding: 12px; font-size: 14px">The approval covers exactly these 88 changes. If the next run finds a different set, it is blocked again. Recorded in the audit trail as Dodoe M.</div>
+<label style="display: flex; align-items: center; gap: 10px; font-size: 14px"><input type="checkbox" style="width: 18px; height: 18px; margin: 0">I checked the list and the rule change behind it</label>
+<div style="display: flex; justify-content: flex-end; gap: 8px">
+<button class="btn" type="button">Cancel</button>
+<button class="btn primary" type="button">Approve once</button>
+</div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

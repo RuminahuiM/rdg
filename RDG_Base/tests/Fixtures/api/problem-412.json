@@ -1,0 +1,15 @@
+{
+  "schema": "Problem",
+  "valid": true,
+  "body": {
+    "type": "https://rdg.invalid/problems/precondition-failed",
+    "title": "Changed by someone else",
+    "status": 412,
+    "correlationId": "4f2a9c1e-7b3d-4e11-9a0c-58d2e6b1f7a3",
+    "current": {
+      "etag": "\"y\"",
+      "updatedAt": "2026-10-09T14:02:00Z",
+      "updatedBy": "sam.sample@contoso.org"
+    }
+  }
+}

@@ -1,0 +1,2957 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "RDG API",
+    "version": "0.1.0",
+    "summary": "Manage rule-based group definitions, settings, runs and approvals.",
+    "description": "Served by the Function App linked to the Static Web App. Every call goes through the\nStatic Web App, which signs the user in (Entra) and forwards the principal in the\n`x-ms-client-principal` header; direct calls to the Function App are refused.\n\nRoles: `reader` may call every GET endpoint plus `POST /rules/validate` and `POST /preview`.\nEverything else needs `admin`. The API checks the role again on every endpoint.\n\nThe API never changes group members. It stores configuration, checks rules with the\nengine module and starts runbook jobs.\n\nErrors use RFC 9457 problem details (`application/problem+json`).\nAll times are UTC, ISO 8601. Lists are paged with an opaque `continuationToken`.\n"
+  },
+  "servers": [
+    {
+      "url": "/api"
+    }
+  ],
+  "tags": [
+    {
+      "name": "session",
+      "description": "Who is signed in and how the installation runs."
+    },
+    {
+      "name": "definitions",
+      "description": "Rule-based group definitions, merged with the engine's status; sync now and approvals."
+    },
+    {
+      "name": "runs",
+      "description": "Run records written by the engine (30 days)."
+    },
+    {
+      "name": "rules",
+      "description": "Rule validation and previews with the engine module."
+    },
+    {
+      "name": "settings",
+      "description": "Organisation settings, including the pause switch."
+    },
+    {
+      "name": "audit",
+      "description": "Change history of definitions and settings."
+    },
+    {
+      "name": "directory",
+      "description": "Read-only Graph lookups for the pickers."
+    },
+    {
+      "name": "system",
+      "description": "Health check and the Static Web Apps roles source."
+    }
+  ],
+  "security": [],
+  "paths": {
+    "/me": {
+      "get": {
+        "tags": [
+          "session"
+        ],
+        "operationId": "getMe",
+        "summary": "Signed-in user, roles and installation mode",
+        "description": "Used by the web app on start, e.g. to show the read-only banner and hide edit controls for readers.",
+        "x-rdg-roles": [
+          "reader",
+          "admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Me"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      }
+    },
+    "/definitions": {
+      "get": {
+        "tags": [
+          "definitions"
+        ],
+        "operationId": "listDefinitions",
+        "summary": "List definitions with their status",
+        "x-rdg-roles": [
+          "reader",
+          "admin"
+        ],
+        "parameters": [
+          {
+            "name": "groupType",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/GroupType"
+            }
+          },
+          {
+            "name": "result",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/SyncResult"
+            }
+          },
+          {
+            "name": "enabled",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Case-insensitive match on name and target group display name.",
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          },
+          {
+            "$ref": "#/components/parameters/ContinuationToken"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefinitionPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "definitions"
+        ],
+        "operationId": "createDefinition",
+        "summary": "Create a definition",
+        "description": "Validates the rule with the engine module. `target.mode = adopt` starts the adoption:\nthe engine runs a forced dry run and waits for approval. Writes an audit record in the\nsame transactional batch.\n",
+        "x-rdg-roles": [
+          "admin"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DefinitionInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "headers": {
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              },
+              "Location": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Definition"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/definitions/{id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/DefinitionId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "definitions"
+        ],
+        "operationId": "getDefinition",
+        "summary": "One definition with its status",
+        "x-rdg-roles": [
+          "reader",
+          "admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Definition"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "definitions"
+        ],
+        "operationId": "updateDefinition",
+        "summary": "Update a definition",
+        "x-rdg-roles": [
+          "admin"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DefinitionInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Definition"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "definitions"
+        ],
+        "operationId": "deleteDefinition",
+        "summary": "Delete a definition",
+        "description": "Releases the target group unchanged; never deletes the group. Audit records stay until\nthey expire. If other definitions reference this one's group in a memberOf rule, the\nAPI refuses with 409 and lists them, unless `force=true`.\n",
+        "x-rdg-roles": [
+          "admin"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          },
+          {
+            "name": "force",
+            "in": "query",
+            "description": "Delete even though other definitions reference this one.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          }
+        }
+      }
+    },
+    "/definitions/{id}/sync": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/DefinitionId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "definitions"
+        ],
+        "operationId": "syncDefinition",
+        "summary": "Sync now",
+        "description": "Records a sync request on the definition (with audit) and starts a job of the matching\nrunbook. If the job can't be started, the request stays and the next scheduled run\nhandles it. Repeated calls within one minute return the existing request.\nThe web app polls the definition until `status.handledSyncRequestAt` reaches `requestedAt`.\n",
+        "x-rdg-roles": [
+          "admin"
+        ],
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncAccepted"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/definitions/{id}/approve": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/DefinitionId"
+        }
+      ],
+      "post": {
+        "tags": [
+          "definitions"
+        ],
+        "operationId": "approveDefinition",
+        "summary": "One-time approval of a blocked change or an adoption",
+        "description": "Approves exactly the diff identified by `diffHash` (from `status.pendingApproval`). The next\nrun writes it; a different diff needs a new approval. Refused with 409 when nothing waits\nfor approval, the hash no longer matches, or the installation is read-only.\n",
+        "x-rdg-roles": [
+          "admin"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApprovalInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Approved",
+            "headers": {
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Definition"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/definitions/{id}/runs": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/DefinitionId"
+        }
+      ],
+      "get": {
+        "tags": [
+          "runs"
+        ],
+        "operationId": "listDefinitionRuns",
+        "summary": "Run records of one definition, newest first (30 days)",
+        "x-rdg-roles": [
+          "reader",
+          "admin"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ContinuationToken"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunPage"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/runs": {
+      "get": {
+        "tags": [
+          "runs"
+        ],
+        "operationId": "listRuns",
+        "summary": "Latest runs across all definitions (Activity)",
+        "x-rdg-roles": [
+          "reader",
+          "admin"
+        ],
+        "parameters": [
+          {
+            "name": "result",
+            "in": "query",
+            "schema": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/SyncResult"
+                },
+                {
+                  "enum": [
+                    "SkippedTick",
+                    "Paused"
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "runbook",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Provider"
+            }
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/ContinuationToken"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      }
+    },
+    "/rules/validate": {
+      "post": {
+        "tags": [
+          "rules"
+        ],
+        "operationId": "validateRule",
+        "summary": "Check rule text",
+        "description": "Parses the rule with the engine module and returns every error with its position.\nCalled by the editor 400 ms after typing stops. No Graph calls except checking that\ngroup IDs used in memberOf exist. Always 200; the result says whether the rule is valid.\n",
+        "x-rdg-roles": [
+          "reader",
+          "admin"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RuleValidationInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Validation result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RuleValidationResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      }
+    },
+    "/preview": {
+      "post": {
+        "tags": [
+          "rules"
+        ],
+        "operationId": "preview",
+        "summary": "Members a definition would have now",
+        "description": "Evaluates a saved definition (`definitionId`) or an unsaved one (`definition`) against live\ndirectory data. For Exchange group types, users without a mail address are only flagged;\nthe exact recipient check happens at sync.\n",
+        "x-rdg-roles": [
+          "reader",
+          "admin"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreviewInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreviewResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/settings": {
+      "get": {
+        "tags": [
+          "settings"
+        ],
+        "operationId": "getSettings",
+        "summary": "Organisation settings",
+        "x-rdg-roles": [
+          "reader",
+          "admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Settings"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "settings"
+        ],
+        "operationId": "updateSettings",
+        "summary": "Update organisation settings (including the pause switch)",
+        "x-rdg-roles": [
+          "admin"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IfMatch"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingsInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "headers": {
+              "ETag": {
+                "$ref": "#/components/headers/ETag"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Settings"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "412": {
+            "$ref": "#/components/responses/PreconditionFailed"
+          },
+          "428": {
+            "$ref": "#/components/responses/PreconditionRequired"
+          }
+        }
+      }
+    },
+    "/audit": {
+      "get": {
+        "tags": [
+          "audit"
+        ],
+        "operationId": "listAudit",
+        "summary": "Change history, newest first",
+        "x-rdg-roles": [
+          "reader",
+          "admin"
+        ],
+        "parameters": [
+          {
+            "name": "definitionId",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/DefinitionId"
+            }
+          },
+          {
+            "name": "by",
+            "in": "query",
+            "description": "UPN of the person who made the change.",
+            "schema": {
+              "type": "string",
+              "maxLength": 256
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/ContinuationToken"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      }
+    },
+    "/directory/users": {
+      "get": {
+        "tags": [
+          "directory"
+        ],
+        "operationId": "searchUsers",
+        "summary": "People picker (always include / always exclude)",
+        "x-rdg-roles": [
+          "reader",
+          "admin"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Search"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Up to 25 matches",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "maxItems": 25,
+                      "items": {
+                        "$ref": "#/components/schemas/DirectoryUser"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/directory/groups": {
+      "get": {
+        "tags": [
+          "directory"
+        ],
+        "operationId": "searchGroups",
+        "summary": "Group picker (target, adopt, compare group, memberOf)",
+        "description": "Includes the flags the pickers need to disable groups RDG can't manage.",
+        "x-rdg-roles": [
+          "reader",
+          "admin"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Search"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Up to 25 matches",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "items"
+                  ],
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "maxItems": 25,
+                      "items": {
+                        "$ref": "#/components/schemas/DirectoryGroup"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "system"
+        ],
+        "operationId": "getHealth",
+        "summary": "Deployment check (anonymous)",
+        "description": "Returns only the version and \"ok\", no data. Used by the pipeline's smoke test.",
+        "x-rdg-roles": [
+          "anonymous"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "status",
+                    "version"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "status": {
+                      "const": "ok"
+                    },
+                    "version": {
+                      "$ref": "#/components/schemas/Version"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/roles": {
+      "post": {
+        "tags": [
+          "system"
+        ],
+        "operationId": "getRoles",
+        "summary": "Roles source for Static Web Apps (internal)",
+        "description": "Called by the Static Web App after sign-in (`rolesSource` in staticwebapp.config.json), not\nby the web app. Turns the token's `roles` claim (Entra app roles Admin, Reader) into the\nStatic Web Apps roles `admin` and `reader`. Not one of the 18 user-facing endpoints.\n",
+        "x-rdg-roles": [
+          "static-web-app"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "identityProvider",
+                  "userId",
+                  "userDetails",
+                  "claims"
+                ],
+                "properties": {
+                  "identityProvider": {
+                    "type": "string"
+                  },
+                  "userId": {
+                    "type": "string"
+                  },
+                  "userDetails": {
+                    "type": "string"
+                  },
+                  "accessToken": {
+                    "type": "string"
+                  },
+                  "claims": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "typ",
+                        "val"
+                      ],
+                      "properties": {
+                        "typ": {
+                          "type": "string"
+                        },
+                        "val": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Roles for this user (may be empty)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "roles"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "roles": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Role"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "DefinitionId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/DefinitionId"
+        }
+      },
+      "IfMatch": {
+        "name": "If-Match",
+        "in": "header",
+        "required": true,
+        "description": "ETag from the last GET. Missing → 428; outdated → 412.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "ContinuationToken": {
+        "name": "continuationToken",
+        "in": "query",
+        "description": "Opaque token from the previous page. Pages hold up to 50 items.",
+        "schema": {
+          "type": "string",
+          "maxLength": 4096
+        }
+      },
+      "Search": {
+        "name": "search",
+        "in": "query",
+        "required": true,
+        "description": "At least 2 characters; matches display name, UPN or mail by prefix.",
+        "schema": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 100
+        }
+      }
+    },
+    "headers": {
+      "ETag": {
+        "description": "Version of the returned document, for If-Match on the next write.",
+        "schema": {
+          "type": "string"
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Invalid input or rule",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "No signed-in user",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "The user's role doesn't allow this",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Definition not found",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            }
+          }
+        }
+      },
+      "Conflict": {
+        "description": "The request conflicts with current state: target group already linked to another\ndefinition, definition referenced by others (delete), nothing to approve or hash\nmismatch (approve), read-only installation (approve, sync of a create/adopt).\n",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            }
+          }
+        }
+      },
+      "PreconditionFailed": {
+        "description": "ETag mismatch; someone else changed the document. Carries who changed it last.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            }
+          }
+        }
+      },
+      "PreconditionRequired": {
+        "description": "If-Match header missing",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            }
+          }
+        }
+      },
+      "TooManyRequests": {
+        "description": "Graph throttled the request; retry after the given seconds",
+        "headers": {
+          "Retry-After": {
+            "schema": {
+              "type": "integer"
+            }
+          }
+        },
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "DefinitionId": {
+        "type": "string",
+        "pattern": "^def-[0-9A-HJKMNP-TV-Z]{26}$",
+        "examples": [
+          "def-01JA7K3M9QXR4T6V8W0Y2Z4B6D"
+        ]
+      },
+      "ObjectId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "Timestamp": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "Version": {
+        "type": "string",
+        "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?$"
+      },
+      "Role": {
+        "enum": [
+          "admin",
+          "reader"
+        ]
+      },
+      "AccessMode": {
+        "enum": [
+          "read-only",
+          "read-write"
+        ]
+      },
+      "GroupType": {
+        "enum": [
+          "Security",
+          "Microsoft365",
+          "MailEnabledSecurity",
+          "Distribution"
+        ]
+      },
+      "Provider": {
+        "enum": [
+          "Entra",
+          "Exchange"
+        ]
+      },
+      "SyncResult": {
+        "enum": [
+          "OK",
+          "Warning",
+          "Blocked",
+          "Error",
+          "DryRun",
+          "WaitingForApproval"
+        ]
+      },
+      "DryRunReason": {
+        "enum": [
+          "definition",
+          "newGroup",
+          "adoption",
+          "readOnly"
+        ]
+      },
+      "Sha256": {
+        "type": "string",
+        "pattern": "^sha256:[0-9a-f]{64}$"
+      },
+      "Me": {
+        "type": "object",
+        "required": [
+          "upn",
+          "roles",
+          "accessMode",
+          "version"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "upn": {
+            "type": "string",
+            "description": "From the Static Web App principal (userDetails)."
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            }
+          },
+          "accessMode": {
+            "$ref": "#/components/schemas/AccessMode"
+          },
+          "version": {
+            "$ref": "#/components/schemas/Version"
+          }
+        }
+      },
+      "UserRef": {
+        "type": "object",
+        "required": [
+          "id",
+          "upn"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ObjectId"
+          },
+          "upn": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          }
+        }
+      },
+      "Target": {
+        "type": "object",
+        "required": [
+          "mode"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "mode": {
+            "enum": [
+              "create",
+              "existing",
+              "adopt"
+            ],
+            "description": "create = RDG creates the group; existing = a group RDG already owns; adopt = take over a group that exists outside RDG."
+          },
+          "groupId": {
+            "$ref": "#/components/schemas/ObjectId",
+            "description": "Required for existing and adopt; set by the API from status for create once the group exists."
+          },
+          "displayName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256,
+            "description": "Required for create (without prefix/suffix)."
+          },
+          "mailNickname": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9._-]{1,64}$"
+          },
+          "renameOnAdopt": {
+            "type": "boolean",
+            "default": false
+          },
+          "convertFromDynamic": {
+            "type": "boolean",
+            "readOnly": true,
+            "description": "Set by the API when the adopted group is a Microsoft dynamic group."
+          },
+          "adopted": {
+            "type": "boolean",
+            "readOnly": true
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "mode": {
+                  "enum": [
+                    "existing",
+                    "adopt"
+                  ]
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "groupId"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "mode": {
+                  "const": "create"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "displayName"
+              ]
+            }
+          }
+        ]
+      },
+      "DefinitionFields": {
+        "description": "Fields of a definition that IT sets. Not used on its own; see DefinitionInput and Definition.",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "groupType": {
+            "$ref": "#/components/schemas/GroupType"
+          },
+          "target": {
+            "$ref": "#/components/schemas/Target"
+          },
+          "rule": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "includeUserIds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ObjectId"
+            },
+            "uniqueItems": true,
+            "maxItems": 500,
+            "default": []
+          },
+          "excludeUserIds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ObjectId"
+            },
+            "uniqueItems": true,
+            "maxItems": 500,
+            "default": []
+          },
+          "includeDisabled": {
+            "type": "boolean",
+            "default": false
+          },
+          "includeGuests": {
+            "type": "boolean",
+            "default": false
+          },
+          "frequencyMinutes": {
+            "type": "integer",
+            "minimum": 3,
+            "maximum": 1440,
+            "default": 15
+          },
+          "enabled": {
+            "type": "boolean",
+            "default": true
+          },
+          "dryRun": {
+            "type": "boolean",
+            "default": false
+          },
+          "changeLimitPercent": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 100,
+            "default": null,
+            "description": "null = organisation default."
+          },
+          "allowEmpty": {
+            "type": "boolean",
+            "default": false
+          },
+          "compareGroupId": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ObjectId"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        }
+      },
+      "DefinitionInput": {
+        "description": "Request body for create and update.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DefinitionFields"
+          }
+        ],
+        "required": [
+          "name",
+          "groupType",
+          "target",
+          "rule"
+        ],
+        "unevaluatedProperties": false
+      },
+      "Status": {
+        "type": "object",
+        "description": "Written by the engine; read-only for the API and the web app.",
+        "required": [
+          "lastSyncUtc",
+          "lastResult",
+          "memberCount",
+          "added",
+          "removed",
+          "skipped",
+          "excluded"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "groupId": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ObjectId"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lastSyncUtc": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "lastResult": {
+            "$ref": "#/components/schemas/SyncResult"
+          },
+          "dryRunReason": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DryRunReason"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "memberCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "added": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "removed": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "skipped": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "excluded": {
+            "type": "object",
+            "required": [
+              "disabled",
+              "guests"
+            ],
+            "properties": {
+              "disabled": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "guests": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "lastError": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "lastRunId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "handledSyncRequestAt": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Timestamp"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "pendingApproval": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ApprovalRequest"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "manualChangeDetected": {
+            "type": "boolean"
+          },
+          "compare": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "groupId",
+                  "onlyInRdg",
+                  "onlyInCompare"
+                ],
+                "properties": {
+                  "groupId": {
+                    "$ref": "#/components/schemas/ObjectId"
+                  },
+                  "onlyInRdg": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "onlyInCompare": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "ApprovalRequest": {
+        "type": "object",
+        "required": [
+          "kind",
+          "diffHash",
+          "adds",
+          "removes",
+          "percent"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "changeLimit",
+              "adopt"
+            ]
+          },
+          "diffHash": {
+            "$ref": "#/components/schemas/Sha256"
+          },
+          "adds": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "removes": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "percent": {
+            "type": "number",
+            "minimum": 0
+          },
+          "detectedAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          }
+        }
+      },
+      "Definition": {
+        "description": "A definition as stored, merged with the engine's status (null before the first run).",
+        "required": [
+          "name",
+          "groupType",
+          "target",
+          "rule",
+          "includeUserIds",
+          "excludeUserIds",
+          "includeDisabled",
+          "includeGuests",
+          "frequencyMinutes",
+          "enabled",
+          "dryRun",
+          "changeLimitPercent",
+          "allowEmpty",
+          "compareGroupId"
+        ],
+        "unevaluatedProperties": false,
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DefinitionFields"
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "etag",
+              "createdAt",
+              "createdBy",
+              "updatedAt",
+              "updatedBy",
+              "syncRequest",
+              "approval",
+              "status"
+            ],
+            "properties": {
+              "id": {
+                "$ref": "#/components/schemas/DefinitionId"
+              },
+              "etag": {
+                "type": "string",
+                "description": "Same value as the ETag header; lets list rows be edited."
+              },
+              "createdAt": {
+                "$ref": "#/components/schemas/Timestamp"
+              },
+              "createdBy": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "$ref": "#/components/schemas/Timestamp"
+              },
+              "updatedBy": {
+                "type": "string"
+              },
+              "syncRequest": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "at",
+                      "by"
+                    ],
+                    "properties": {
+                      "at": {
+                        "$ref": "#/components/schemas/Timestamp"
+                      },
+                      "by": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                ]
+              },
+              "approval": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "kind",
+                      "diffHash",
+                      "adds",
+                      "removes",
+                      "by",
+                      "at"
+                    ],
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "changeLimit",
+                          "adopt"
+                        ]
+                      },
+                      "diffHash": {
+                        "$ref": "#/components/schemas/Sha256"
+                      },
+                      "adds": {
+                        "type": "integer"
+                      },
+                      "removes": {
+                        "type": "integer"
+                      },
+                      "by": {
+                        "type": "string"
+                      },
+                      "at": {
+                        "$ref": "#/components/schemas/Timestamp"
+                      }
+                    }
+                  }
+                ]
+              },
+              "status": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/Status"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "includeUsers": {
+                "type": "array",
+                "readOnly": true,
+                "description": "Only on GET /definitions/{id}: the users of includeUserIds with their names (users that no longer exist are left out). Missing when Graph couldn't be read.",
+                "items": {
+                  "$ref": "#/components/schemas/UserRef"
+                }
+              },
+              "excludeUsers": {
+                "type": "array",
+                "readOnly": true,
+                "description": "Only on GET /definitions/{id}: the users of excludeUserIds with their names, as includeUsers.",
+                "items": {
+                  "$ref": "#/components/schemas/UserRef"
+                }
+              },
+              "compareGroup": {
+                "type": "object",
+                "readOnly": true,
+                "description": "Only on GET /definitions/{id}: name of the compare group.",
+                "required": [
+                  "id",
+                  "displayName"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/components/schemas/ObjectId"
+                  },
+                  "displayName": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "DefinitionPage": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/Definition"
+            }
+          },
+          "continuationToken": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "SyncAccepted": {
+        "type": "object",
+        "required": [
+          "requestedAt",
+          "jobStarted"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "requestedAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "jobStarted": {
+            "type": "boolean",
+            "description": "false = the next scheduled run picks up the request."
+          },
+          "jobId": {
+            "$ref": "#/components/schemas/ObjectId"
+          },
+          "existingRequest": {
+            "type": "boolean",
+            "description": "true = a request from the last minute was returned instead of starting another job."
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "ApprovalInput": {
+        "type": "object",
+        "required": [
+          "kind",
+          "diffHash"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "enum": [
+              "changeLimit",
+              "adopt"
+            ]
+          },
+          "diffHash": {
+            "$ref": "#/components/schemas/Sha256"
+          }
+        }
+      },
+      "Run": {
+        "type": "object",
+        "required": [
+          "id",
+          "jobId",
+          "runbook",
+          "mode",
+          "startedAt",
+          "durationMs",
+          "result",
+          "engineVersion"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "definitionId": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DefinitionId"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "definitionName": {
+            "type": "string"
+          },
+          "groupId": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ObjectId"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "jobId": {
+            "$ref": "#/components/schemas/ObjectId"
+          },
+          "jobUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Link to the Automation job in the Azure portal."
+          },
+          "runbook": {
+            "$ref": "#/components/schemas/Provider"
+          },
+          "mode": {
+            "enum": [
+              "Scheduled",
+              "SyncNow"
+            ]
+          },
+          "startedAt": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "durationMs": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "engineVersion": {
+            "type": "string"
+          },
+          "result": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/SyncResult"
+              },
+              {
+                "enum": [
+                  "SkippedTick",
+                  "Paused"
+                ]
+              }
+            ]
+          },
+          "dryRun": {
+            "type": "boolean"
+          },
+          "dryRunReason": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DryRunReason"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "then": {
+            "description": "Dry runs only: what a real run would have done (read-write access, dry run off).",
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "result",
+                  "message",
+                  "approvalKind"
+                ],
+                "properties": {
+                  "result": {
+                    "$ref": "#/components/schemas/SyncResult"
+                  },
+                  "message": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "approvalKind": {
+                    "enum": [
+                      "adopt",
+                      "changeLimit",
+                      null
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          "addedCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "removedCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "skippedCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "added": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserRef"
+            }
+          },
+          "removed": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserRef"
+            }
+          },
+          "skipped": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserRef"
+            }
+          },
+          "excluded": {
+            "type": "object",
+            "properties": {
+              "disabled": {
+                "type": "integer"
+              },
+              "guests": {
+                "type": "integer"
+              }
+            }
+          },
+          "manualChangesReverted": {
+            "type": "object",
+            "properties": {
+              "added": {
+                "type": "integer"
+              },
+              "removed": {
+                "type": "integer"
+              }
+            }
+          },
+          "approval": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ApprovalRequest"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "compare": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "groupId",
+                  "onlyInRdgCount",
+                  "onlyInCompareCount",
+                  "onlyInRdg",
+                  "onlyInCompare"
+                ],
+                "properties": {
+                  "groupId": {
+                    "$ref": "#/components/schemas/ObjectId"
+                  },
+                  "onlyInRdgCount": {
+                    "type": "integer"
+                  },
+                  "onlyInCompareCount": {
+                    "type": "integer"
+                  },
+                  "onlyInRdg": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/UserRef"
+                    }
+                  },
+                  "onlyInCompare": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/UserRef"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      },
+      "RunPage": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/Run"
+            }
+          },
+          "continuationToken": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "RuleValidationInput": {
+        "type": "object",
+        "required": [
+          "rule"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "rule": {
+            "type": "string",
+            "maxLength": 10000
+          },
+          "groupType": {
+            "$ref": "#/components/schemas/GroupType"
+          }
+        }
+      },
+      "RuleError": {
+        "type": "object",
+        "required": [
+          "position",
+          "line",
+          "column",
+          "length",
+          "message"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "position": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "0-based character offset in the rule text."
+          },
+          "line": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "column": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "length": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Characters to underline."
+          },
+          "message": {
+            "type": "string"
+          },
+          "suggestion": {
+            "type": "string",
+            "description": "e.g. the property name that was probably meant."
+          }
+        }
+      },
+      "RuleValidationResult": {
+        "type": "object",
+        "required": [
+          "valid",
+          "errors",
+          "referencedGroupIds"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "valid": {
+            "type": "boolean"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RuleError"
+            }
+          },
+          "referencedGroupIds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ObjectId"
+            }
+          },
+          "unknownGroupIds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ObjectId"
+            }
+          }
+        }
+      },
+      "PreviewInput": {
+        "type": "object",
+        "description": "definitionId alone previews the saved definition, definition alone a new, unsaved one. Both together preview unsaved changes to a saved definition: the edited version replaces the saved one for this preview.",
+        "minProperties": 1,
+        "additionalProperties": false,
+        "properties": {
+          "definitionId": {
+            "$ref": "#/components/schemas/DefinitionId"
+          },
+          "definition": {
+            "$ref": "#/components/schemas/DefinitionInput"
+          }
+        }
+      },
+      "PreviewResult": {
+        "type": "object",
+        "required": [
+          "memberCount",
+          "members",
+          "excluded",
+          "excludedCounts",
+          "diff",
+          "changeLimit",
+          "emptyResult",
+          "warnings"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "memberCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "members": {
+            "type": "array",
+            "maxItems": 200,
+            "items": {
+              "$ref": "#/components/schemas/UserRef"
+            }
+          },
+          "excluded": {
+            "type": "array",
+            "maxItems": 200,
+            "items": {
+              "type": "object",
+              "required": [
+                "user",
+                "reason"
+              ],
+              "properties": {
+                "user": {
+                  "$ref": "#/components/schemas/UserRef"
+                },
+                "reason": {
+                  "enum": [
+                    "disabled",
+                    "guest",
+                    "excludeList",
+                    "noExchangeRecipient"
+                  ]
+                }
+              }
+            }
+          },
+          "excludedCounts": {
+            "description": "Complete counts per reason; the excluded list stops at 200 entries.",
+            "type": "object",
+            "required": [
+              "disabled",
+              "guest",
+              "excludeList",
+              "noExchangeRecipient"
+            ],
+            "properties": {
+              "disabled": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "guest": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "excludeList": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "noExchangeRecipient": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          "emptyResult": {
+            "description": "The sync blocks a result that would empty a group with members, unless the definition allows it.",
+            "type": "object",
+            "required": [
+              "wouldBlock",
+              "currentMembers",
+              "allowEmpty"
+            ],
+            "properties": {
+              "wouldBlock": {
+                "type": "boolean"
+              },
+              "currentMembers": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "allowEmpty": {
+                "type": "boolean"
+              }
+            }
+          },
+          "diff": {
+            "description": "Against the current target group; null for a group that doesn't exist yet.",
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "addCount",
+                  "removeCount",
+                  "adds",
+                  "removes"
+                ],
+                "properties": {
+                  "addCount": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "removeCount": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "adds": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "$ref": "#/components/schemas/UserRef"
+                    }
+                  },
+                  "removes": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "$ref": "#/components/schemas/UserRef"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "changeLimit": {
+            "type": "object",
+            "required": [
+              "wouldBlock",
+              "percent",
+              "limitPercent"
+            ],
+            "properties": {
+              "wouldBlock": {
+                "type": "boolean"
+              },
+              "percent": {
+                "type": "number",
+                "minimum": 0
+              },
+              "limitPercent": {
+                "type": "integer"
+              }
+            }
+          },
+          "compare": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "onlyInRdgCount",
+                  "onlyInCompareCount",
+                  "onlyInRdg",
+                  "onlyInCompare"
+                ],
+                "properties": {
+                  "onlyInRdgCount": {
+                    "type": "integer"
+                  },
+                  "onlyInCompareCount": {
+                    "type": "integer"
+                  },
+                  "onlyInRdg": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "$ref": "#/components/schemas/UserRef"
+                    }
+                  },
+                  "onlyInCompare": {
+                    "type": "array",
+                    "maxItems": 200,
+                    "items": {
+                      "$ref": "#/components/schemas/UserRef"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "SettingsFields": {
+        "type": "object",
+        "required": [
+          "paused",
+          "verboseLogging",
+          "changeLimitPercent",
+          "changeLimitMinChanges",
+          "newGroupsDryRun",
+          "nestedMembers",
+          "frequencyOptions",
+          "naming",
+          "marker",
+          "auditRetentionDays"
+        ],
+        "properties": {
+          "paused": {
+            "type": "boolean"
+          },
+          "verboseLogging": {
+            "type": "boolean"
+          },
+          "changeLimitPercent": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "changeLimitMinChanges": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000
+          },
+          "newGroupsDryRun": {
+            "type": "boolean"
+          },
+          "nestedMembers": {
+            "type": "boolean"
+          },
+          "frequencyOptions": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 3,
+              "maximum": 1440
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "naming": {
+            "type": "object",
+            "required": [
+              "prefix",
+              "suffix"
+            ],
+            "properties": {
+              "prefix": {
+                "$ref": "#/components/schemas/Affix"
+              },
+              "suffix": {
+                "$ref": "#/components/schemas/Affix"
+              }
+            }
+          },
+          "marker": {
+            "type": "object",
+            "required": [
+              "enabled",
+              "exchangeCustomAttribute"
+            ],
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "exchangeCustomAttribute": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 15
+              }
+            }
+          },
+          "auditRetentionDays": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3650
+          }
+        }
+      },
+      "SettingsInput": {
+        "description": "Request body for PUT /settings.",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SettingsFields"
+          }
+        ],
+        "unevaluatedProperties": false
+      },
+      "Settings": {
+        "unevaluatedProperties": false,
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SettingsFields"
+          },
+          {
+            "type": "object",
+            "required": [
+              "etag",
+              "pausedAt",
+              "pausedBy",
+              "updatedAt",
+              "updatedBy"
+            ],
+            "properties": {
+              "etag": {
+                "type": "string"
+              },
+              "pausedAt": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/Timestamp"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "pausedBy": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "updatedAt": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/Timestamp"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "updatedBy": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "Affix": {
+        "type": "object",
+        "required": [
+          "enabled",
+          "text"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 20
+          }
+        }
+      },
+      "AuditEntry": {
+        "type": "object",
+        "required": [
+          "id",
+          "at",
+          "by",
+          "action",
+          "changes"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "definitionId": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DefinitionId"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "definitionName": {
+            "type": "string"
+          },
+          "at": {
+            "$ref": "#/components/schemas/Timestamp"
+          },
+          "by": {
+            "type": "string"
+          },
+          "action": {
+            "enum": [
+              "create",
+              "update",
+              "delete",
+              "adopt",
+              "approve",
+              "syncNow",
+              "settings"
+            ]
+          },
+          "changes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "field",
+                "old",
+                "new"
+              ],
+              "properties": {
+                "field": {
+                  "type": "string"
+                },
+                "old": {},
+                "new": {}
+              }
+            }
+          }
+        }
+      },
+      "AuditPage": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "$ref": "#/components/schemas/AuditEntry"
+            }
+          },
+          "continuationToken": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "DirectoryUser": {
+        "type": "object",
+        "required": [
+          "id",
+          "upn",
+          "displayName",
+          "accountEnabled",
+          "userType"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ObjectId"
+          },
+          "upn": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "mail": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "accountEnabled": {
+            "type": "boolean"
+          },
+          "userType": {
+            "enum": [
+              "Member",
+              "Guest"
+            ]
+          }
+        }
+      },
+      "DirectoryGroup": {
+        "type": "object",
+        "required": [
+          "id",
+          "displayName",
+          "groupType",
+          "isDynamic",
+          "onPremisesSynced",
+          "isAssignableToRole",
+          "managedByDefinitionId"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/ObjectId"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "mail": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "groupType": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GroupType"
+              },
+              {
+                "enum": [
+                  "Other"
+                ]
+              }
+            ]
+          },
+          "memberCount": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "null when Graph didn't return a count."
+          },
+          "isDynamic": {
+            "type": "boolean",
+            "description": "Microsoft dynamic membership group."
+          },
+          "membershipRule": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Rule text of a Microsoft dynamic group, used to pre-fill an adoption."
+          },
+          "onPremisesSynced": {
+            "type": "boolean"
+          },
+          "isAssignableToRole": {
+            "type": "boolean"
+          },
+          "managedByDefinitionId": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DefinitionId"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "linkedToName": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Name of the definition that already manages it."
+          }
+        }
+      },
+      "Problem": {
+        "type": "object",
+        "description": "RFC 9457 problem details, extended with RDG fields.",
+        "required": [
+          "type",
+          "title",
+          "status",
+          "correlationId"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uri-reference",
+            "examples": [
+              "https://rdg.invalid/problems/validation"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "type": "string"
+          },
+          "correlationId": {
+            "type": "string",
+            "description": "Matches the API log entry."
+          },
+          "errors": {
+            "type": "array",
+            "description": "Field and rule errors (400).",
+            "items": {
+              "type": "object",
+              "required": [
+                "field",
+                "message"
+              ],
+              "properties": {
+                "field": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": "integer"
+                },
+                "line": {
+                  "type": "integer"
+                },
+                "column": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "current": {
+            "description": "On 412, who changed the document last and its current ETag.",
+            "type": "object",
+            "properties": {
+              "etag": {
+                "type": "string"
+              },
+              "updatedAt": {
+                "$ref": "#/components/schemas/Timestamp"
+              },
+              "updatedBy": {
+                "type": "string"
+              }
+            }
+          },
+          "referencedBy": {
+            "description": "On 409 for delete, the definitions whose rules reference this one.",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "name"
+              ],
+              "properties": {
+                "id": {
+                  "$ref": "#/components/schemas/DefinitionId"
+                },
+                "name": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "retryAfterSeconds": {
+            "type": "integer",
+            "description": "On 429."
+          }
+        }
+      }
+    }
+  }
+}

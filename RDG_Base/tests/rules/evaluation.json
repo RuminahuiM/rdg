@@ -1,0 +1,678 @@
+{
+  "title": "Rule evaluation",
+  "description": "Who each rule matches among the users below (Graph field names). Raw rule result: implicit filters for disabled accounts and guests are not applied here.",
+  "now": "2026-10-11T12:00:00Z",
+  "groups": {
+    "9a9a9a9a-0000-4000-8000-000000000001": [
+      "alex",
+      "sam"
+    ],
+    "9a9a9a9a-0000-4000-8000-000000000002": [
+      "casey"
+    ]
+  },
+  "users": {
+    "alex": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "displayName": "Alex Example",
+      "userPrincipalName": "alex.example@contoso.org",
+      "mail": "alex.example@contoso.org",
+      "department": "Sales",
+      "city": "Bern",
+      "country": "CH",
+      "jobTitle": "Team Lead Sales",
+      "accountEnabled": true,
+      "userType": "Member",
+      "employeeId": "4711",
+      "onPremisesSyncEnabled": true,
+      "employeeHireDate": "2019-03-01T00:00:00Z",
+      "mailNickname": "alex.example",
+      "businessPhones": [
+        "+41 31 000 00 01"
+      ],
+      "mobilePhone": "+41 79 000 00 01",
+      "officeLocation": "Bern HQ",
+      "faxNumber": null,
+      "proxyAddresses": [
+        "SMTP:alex.example@contoso.org",
+        "smtp:alex@contoso.org",
+        "SIP:alex.example@contoso.org"
+      ],
+      "otherMails": [
+        "alex@example.net"
+      ],
+      "assignedPlans": [
+        {
+          "capabilityStatus": "Enabled",
+          "service": "exchange",
+          "servicePlanId": "efb87545-963c-4e0d-99df-69c6916d9eb0"
+        },
+        {
+          "capabilityStatus": "Deleted",
+          "service": "SCO",
+          "servicePlanId": "c1ec4a95-1f05-45b3-a911-aa3fa01094f5"
+        }
+      ],
+      "onPremisesExtensionAttributes": {
+        "extensionAttribute1": "MGMT1",
+        "extensionAttribute2": null,
+        "extensionAttribute3": "OPS-NORTH",
+        "extensionAttribute4": null,
+        "extensionAttribute5": null,
+        "extensionAttribute6": null,
+        "extensionAttribute7": null,
+        "extensionAttribute8": null,
+        "extensionAttribute9": null,
+        "extensionAttribute10": null,
+        "extensionAttribute11": null,
+        "extensionAttribute12": null,
+        "extensionAttribute13": null,
+        "extensionAttribute14": null,
+        "extensionAttribute15": null
+      },
+      "manager": {
+        "id": "aaaaaaaa-0000-1111-2222-bbbbbbbbbbbb"
+      }
+    },
+    "sam": {
+      "id": "22222222-2222-4222-8222-222222222222",
+      "displayName": "Sam Sample",
+      "userPrincipalName": "sam.sample@contoso.org",
+      "mail": "sam.sample@contoso.org",
+      "department": "Marketing",
+      "city": "Basel",
+      "country": "CH",
+      "jobTitle": "Designer",
+      "accountEnabled": true,
+      "userType": "Member",
+      "employeeId": "4712",
+      "onPremisesSyncEnabled": false,
+      "employeeHireDate": "2026-10-01T00:00:00Z",
+      "mailNickname": "sam.sample",
+      "businessPhones": [],
+      "mobilePhone": null,
+      "officeLocation": null,
+      "proxyAddresses": [
+        "SMTP:sam.sample@contoso.org"
+      ],
+      "otherMails": [],
+      "assignedPlans": [
+        {
+          "capabilityStatus": "Enabled",
+          "service": "SCO",
+          "servicePlanId": "c1ec4a95-1f05-45b3-a911-aa3fa01094f5"
+        }
+      ],
+      "onPremisesExtensionAttributes": {
+        "extensionAttribute1": "MGMT12",
+        "extensionAttribute2": "MGMT2",
+        "extensionAttribute3": null,
+        "extensionAttribute4": null,
+        "extensionAttribute5": null,
+        "extensionAttribute6": null,
+        "extensionAttribute7": null,
+        "extensionAttribute8": null,
+        "extensionAttribute9": null,
+        "extensionAttribute10": null,
+        "extensionAttribute11": null,
+        "extensionAttribute12": null,
+        "extensionAttribute13": null,
+        "extensionAttribute14": null,
+        "extensionAttribute15": null
+      },
+      "manager": {
+        "id": "aaaaaaaa-0000-1111-2222-bbbbbbbbbbbb"
+      }
+    },
+    "casey": {
+      "id": "33333333-3333-4333-8333-333333333333",
+      "displayName": "Casey Test",
+      "userPrincipalName": "casey.test@contoso.org",
+      "mail": null,
+      "department": null,
+      "city": "Zürich",
+      "country": "CH",
+      "jobTitle": null,
+      "accountEnabled": false,
+      "userType": "Member",
+      "employeeId": null,
+      "onPremisesSyncEnabled": null,
+      "employeeHireDate": null,
+      "mailNickname": "casey.test",
+      "businessPhones": [],
+      "proxyAddresses": [],
+      "otherMails": [],
+      "assignedPlans": [],
+      "onPremisesExtensionAttributes": {
+        "extensionAttribute1": null,
+        "extensionAttribute2": null,
+        "extensionAttribute3": null,
+        "extensionAttribute4": null,
+        "extensionAttribute5": null,
+        "extensionAttribute6": null,
+        "extensionAttribute7": null,
+        "extensionAttribute8": null,
+        "extensionAttribute9": null,
+        "extensionAttribute10": null,
+        "extensionAttribute11": null,
+        "extensionAttribute12": null,
+        "extensionAttribute13": null,
+        "extensionAttribute14": null,
+        "extensionAttribute15": null
+      },
+      "manager": null
+    },
+    "jordan": {
+      "id": "44444444-4444-4444-8444-444444444444",
+      "displayName": "Jordan Demo",
+      "userPrincipalName": "jordan.demo_example.net#EXT#@contoso.onmicrosoft.com",
+      "mail": "jordan@example.net",
+      "department": "sales",
+      "city": "Bern",
+      "country": "DE",
+      "jobTitle": "External Consultant",
+      "accountEnabled": true,
+      "userType": "Guest",
+      "employeeId": null,
+      "onPremisesSyncEnabled": null,
+      "employeeHireDate": null,
+      "mailNickname": "jordan.demo",
+      "businessPhones": [],
+      "proxyAddresses": [
+        "SMTP:jordan@example.net"
+      ],
+      "otherMails": [
+        "jordan@example.net"
+      ],
+      "assignedPlans": [],
+      "onPremisesExtensionAttributes": {
+        "extensionAttribute1": null,
+        "extensionAttribute2": null,
+        "extensionAttribute3": "ops-south",
+        "extensionAttribute4": null,
+        "extensionAttribute5": null,
+        "extensionAttribute6": null,
+        "extensionAttribute7": null,
+        "extensionAttribute8": null,
+        "extensionAttribute9": null,
+        "extensionAttribute10": null,
+        "extensionAttribute11": null,
+        "extensionAttribute12": null,
+        "extensionAttribute13": null,
+        "extensionAttribute14": null,
+        "extensionAttribute15": null
+      },
+      "manager": null
+    },
+    "manager": {
+      "id": "aaaaaaaa-0000-1111-2222-bbbbbbbbbbbb",
+      "displayName": "Morgan Manager",
+      "userPrincipalName": "morgan.manager@contoso.org",
+      "mail": "morgan.manager@contoso.org",
+      "department": "Management",
+      "city": "Bern",
+      "country": "CH",
+      "jobTitle": "Director",
+      "accountEnabled": true,
+      "userType": "Member",
+      "employeeId": "1000",
+      "onPremisesSyncEnabled": true,
+      "employeeHireDate": "2010-01-15T08:00:00Z",
+      "mailNickname": "morgan.manager",
+      "businessPhones": [
+        "+41 31 000 00 00"
+      ],
+      "proxyAddresses": [
+        "SMTP:morgan.manager@contoso.org"
+      ],
+      "otherMails": [],
+      "assignedPlans": [],
+      "onPremisesExtensionAttributes": {
+        "extensionAttribute1": "MGMT1",
+        "extensionAttribute2": null,
+        "extensionAttribute3": null,
+        "extensionAttribute4": null,
+        "extensionAttribute5": null,
+        "extensionAttribute6": null,
+        "extensionAttribute7": null,
+        "extensionAttribute8": null,
+        "extensionAttribute9": null,
+        "extensionAttribute10": null,
+        "extensionAttribute11": null,
+        "extensionAttribute12": null,
+        "extensionAttribute13": null,
+        "extensionAttribute14": null,
+        "extensionAttribute15": "DIR1"
+      },
+      "extension_c272a57b722d4eb29bfe327874ae79cb_OfficeNumber": "123",
+      "manager": null
+    }
+  },
+  "cases": [
+    {
+      "id": "eq-ignores-case",
+      "rule": "user.department -eq \"SALES\"",
+      "matches": [
+        "alex",
+        "jordan"
+      ]
+    },
+    {
+      "id": "ne-includes-null",
+      "rule": "user.department -ne \"Sales\"",
+      "matches": [
+        "casey",
+        "manager",
+        "sam"
+      ],
+      "note": "-ne is true for users without the property"
+    },
+    {
+      "id": "eq-null",
+      "rule": "user.department -eq null",
+      "matches": [
+        "casey"
+      ]
+    },
+    {
+      "id": "ne-null",
+      "rule": "user.mail -ne null",
+      "matches": [
+        "alex",
+        "jordan",
+        "manager",
+        "sam"
+      ]
+    },
+    {
+      "id": "startsWith",
+      "rule": "user.jobTitle -startsWith \"team\"",
+      "matches": [
+        "alex"
+      ]
+    },
+    {
+      "id": "notStartsWith-null-true",
+      "rule": "user.jobTitle -notStartsWith \"Team\"",
+      "matches": [
+        "casey",
+        "jordan",
+        "manager",
+        "sam"
+      ]
+    },
+    {
+      "id": "endsWith",
+      "rule": "user.mail -endsWith \"@contoso.org\"",
+      "matches": [
+        "alex",
+        "manager",
+        "sam"
+      ]
+    },
+    {
+      "id": "notEndsWith",
+      "rule": "user.mail -notEndsWith \"@contoso.org\"",
+      "matches": [
+        "casey",
+        "jordan"
+      ]
+    },
+    {
+      "id": "contains-substring",
+      "rule": "user.jobTitle -contains \"sult\"",
+      "matches": [
+        "jordan"
+      ]
+    },
+    {
+      "id": "notContains",
+      "rule": "user.jobTitle -notContains \"e\"",
+      "matches": [
+        "casey"
+      ]
+    },
+    {
+      "id": "match",
+      "rule": "user.displayName -match \"^(alex|sam) \"",
+      "matches": [
+        "alex",
+        "sam"
+      ]
+    },
+    {
+      "id": "notMatch",
+      "rule": "user.displayName -notMatch \"e\"",
+      "matches": []
+    },
+    {
+      "id": "in-exact-items",
+      "rule": "user.extensionAttribute1 -in [\"MGMT1\",\"MGMT2\"]",
+      "matches": [
+        "alex",
+        "manager"
+      ],
+      "note": "MGMT12 must not match: exact values only"
+    },
+    {
+      "id": "notIn",
+      "rule": "user.city -notIn [\"Bern\",\"Basel\"]",
+      "matches": [
+        "casey"
+      ]
+    },
+    {
+      "id": "in-case-insensitive",
+      "rule": "user.extensionAttribute3 -in [\"OPS-SOUTH\"]",
+      "matches": [
+        "jordan"
+      ]
+    },
+    {
+      "id": "extension-startsWith",
+      "rule": "user.extensionAttribute3 -startsWith \"OPS\"",
+      "matches": [
+        "alex",
+        "jordan"
+      ]
+    },
+    {
+      "id": "extension-15",
+      "rule": "user.extensionAttribute15 -eq \"DIR1\"",
+      "matches": [
+        "manager"
+      ]
+    },
+    {
+      "id": "heks-style",
+      "rule": "(user.extensionAttribute1 -in [\"MGMT1\",\"MGMT2\"]) -or (user.extensionAttribute2 -in [\"MGMT1\",\"MGMT2\"]) -or (user.extensionAttribute3 -startsWith \"OPS\")",
+      "matches": [
+        "alex",
+        "jordan",
+        "manager",
+        "sam"
+      ],
+      "note": "structure of the HEKS EOP rule"
+    },
+    {
+      "id": "directory-extension",
+      "rule": "user.extension_c272a57b722d4eb29bfe327874ae79cb_OfficeNumber -eq \"123\"",
+      "matches": [
+        "manager"
+      ]
+    },
+    {
+      "id": "bool-true",
+      "rule": "user.accountEnabled -eq true",
+      "matches": [
+        "alex",
+        "jordan",
+        "manager",
+        "sam"
+      ]
+    },
+    {
+      "id": "bool-false",
+      "rule": "user.accountEnabled -eq false",
+      "matches": [
+        "casey"
+      ]
+    },
+    {
+      "id": "bool-quoted",
+      "rule": "user.accountEnabled -eq \"false\"",
+      "matches": [
+        "casey"
+      ]
+    },
+    {
+      "id": "dirsync",
+      "rule": "user.dirSyncEnabled -eq true",
+      "matches": [
+        "alex",
+        "manager"
+      ]
+    },
+    {
+      "id": "number-as-text",
+      "rule": "user.employeeId -eq 4711",
+      "matches": [
+        "alex"
+      ]
+    },
+    {
+      "id": "employeeId-in-numbers",
+      "rule": "user.employeeId -in [4711, 4712]",
+      "matches": [
+        "alex",
+        "sam"
+      ]
+    },
+    {
+      "id": "objectId",
+      "rule": "user.objectId -eq \"22222222-2222-4222-8222-222222222222\"",
+      "matches": [
+        "sam"
+      ]
+    },
+    {
+      "id": "objectId-ne-null-all",
+      "rule": "user.objectId -ne null",
+      "matches": [
+        "alex",
+        "casey",
+        "jordan",
+        "manager",
+        "sam"
+      ],
+      "note": "Entra's example for 'all users'"
+    },
+    {
+      "id": "mailNickName",
+      "rule": "user.mailNickName -eq \"sam.sample\"",
+      "matches": [
+        "sam"
+      ]
+    },
+    {
+      "id": "mobile",
+      "rule": "user.mobile -startsWith \"+41 79\"",
+      "matches": [
+        "alex"
+      ]
+    },
+    {
+      "id": "telephoneNumber-first",
+      "rule": "user.telephoneNumber -eq \"+41 31 000 00 00\"",
+      "matches": [
+        "manager"
+      ]
+    },
+    {
+      "id": "office",
+      "rule": "user.physicalDeliveryOfficeName -eq \"Bern HQ\"",
+      "matches": [
+        "alex"
+      ]
+    },
+    {
+      "id": "fax-null",
+      "rule": "user.facsimileTelephoneNumber -eq null",
+      "matches": [
+        "alex",
+        "casey",
+        "jordan",
+        "manager",
+        "sam"
+      ]
+    },
+    {
+      "id": "sip",
+      "rule": "user.sipProxyAddress -eq \"alex.example@contoso.org\"",
+      "matches": [
+        "alex"
+      ],
+      "note": "derived from the SIP: entry of proxyAddresses; to verify in the test tenant"
+    },
+    {
+      "id": "usertype",
+      "rule": "user.userType -eq \"guest\"",
+      "matches": [
+        "jordan"
+      ]
+    },
+    {
+      "id": "date-le",
+      "rule": "user.employeeHireDate -le 2015-01-01T00:00:00Z",
+      "matches": [
+        "manager"
+      ]
+    },
+    {
+      "id": "date-ge-now-minus",
+      "rule": "user.employeeHireDate -ge system.now -minus P30D",
+      "matches": [
+        "sam"
+      ],
+      "note": "now = 2026-10-11"
+    },
+    {
+      "id": "date-ge-now",
+      "rule": "user.employeeHireDate -ge system.now",
+      "matches": []
+    },
+    {
+      "id": "date-null",
+      "rule": "user.employeeHireDate -eq null",
+      "matches": [
+        "casey",
+        "jordan"
+      ]
+    },
+    {
+      "id": "date-quoted",
+      "rule": "user.employeeHireDate -ge \"2019-01-01\"",
+      "matches": [
+        "alex",
+        "sam"
+      ]
+    },
+    {
+      "id": "and-or",
+      "rule": "user.city -eq \"Bern\" -and user.country -eq \"CH\" -or user.department -eq \"Marketing\"",
+      "matches": [
+        "alex",
+        "manager",
+        "sam"
+      ]
+    },
+    {
+      "id": "not",
+      "rule": "-not (user.city -eq \"Bern\")",
+      "matches": [
+        "casey",
+        "sam"
+      ]
+    },
+    {
+      "id": "any-proxy",
+      "rule": "user.proxyAddresses -any (_ -startsWith \"smtp:alex\")",
+      "matches": [
+        "alex"
+      ],
+      "note": "prefix matches SMTP: and smtp: alike"
+    },
+    {
+      "id": "any-othermails",
+      "rule": "user.otherMails -any (_ -endsWith \"@example.net\")",
+      "matches": [
+        "alex",
+        "jordan"
+      ]
+    },
+    {
+      "id": "all-proxy-smtp",
+      "rule": "user.proxyAddresses -all (_ -startsWith \"SMTP:\")",
+      "matches": [
+        "casey",
+        "jordan",
+        "manager",
+        "sam"
+      ],
+      "note": "-all is true for an empty collection"
+    },
+    {
+      "id": "any-plans",
+      "rule": "user.assignedPlans -any (assignedPlan.servicePlanId -eq \"efb87545-963c-4e0d-99df-69c6916d9eb0\" -and assignedPlan.capabilityStatus -eq \"Enabled\")",
+      "matches": [
+        "alex"
+      ]
+    },
+    {
+      "id": "any-plans-sco-enabled",
+      "rule": "user.assignedPlans -any (assignedPlan.service -eq \"SCO\" -and assignedPlan.capabilityStatus -eq \"Enabled\")",
+      "matches": [
+        "sam"
+      ]
+    },
+    {
+      "id": "all-plans-null",
+      "rule": "user.assignedPlans -all (assignedPlan.servicePlanId -eq null)",
+      "matches": [
+        "casey",
+        "jordan",
+        "manager"
+      ]
+    },
+    {
+      "id": "memberof",
+      "rule": "user.memberOf -any (group.objectId -in ['9a9a9a9a-0000-4000-8000-000000000001'])",
+      "matches": [
+        "alex",
+        "sam"
+      ]
+    },
+    {
+      "id": "memberof-two",
+      "rule": "user.memberOf -any (group.objectId -in ['9a9a9a9a-0000-4000-8000-000000000001','9a9a9a9a-0000-4000-8000-000000000002'])",
+      "matches": [
+        "alex",
+        "casey",
+        "sam"
+      ]
+    },
+    {
+      "id": "memberof-combined",
+      "rule": "user.memberOf -any (group.objectId -in ['9a9a9a9a-0000-4000-8000-000000000001']) -and user.city -eq \"Bern\"",
+      "matches": [
+        "alex"
+      ]
+    },
+    {
+      "id": "direct-reports",
+      "rule": "Direct Reports for \"aaaaaaaa-0000-1111-2222-bbbbbbbbbbbb\"",
+      "matches": [
+        "alex",
+        "manager",
+        "sam"
+      ],
+      "note": "Entra adds the manager too"
+    },
+    {
+      "id": "plan-field-any-case",
+      "rule": "user.assignedPlans -any (AssignedPlan.SERVICE -eq \"sco\" -and assignedPlan.CapabilityStatus -eq \"enabled\")",
+      "matches": [
+        "sam"
+      ],
+      "note": "Graph field names are case-sensitive; rules aren't"
+    },
+    {
+      "id": "directory-extension-any-case",
+      "rule": "user.EXTENSION_C272A57B722D4EB29BFE327874AE79CB_officenumber -eq \"123\"",
+      "matches": [
+        "manager"
+      ],
+      "note": "extension names may be written in any case"
+    }
+  ]
+}

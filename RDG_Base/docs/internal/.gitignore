@@ -1,0 +1,3 @@
+# Internal: not for the public repo (real tenant data, HEKS-specific).
+*
+!.gitignore

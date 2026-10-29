@@ -1,0 +1,12 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "powershell",
+    "FUNCTIONS_WORKER_RUNTIME_VERSION": "7.4",
+    "DG_ApiClientId": "<client ID of the api managed identity>",
+    "DG_CosmosEndpoint": "https://<account>.documents.azure.com",
+    "DG_CosmosDatabase": "rdg",
+    "DG_AccessMode": "read-only",
+    "DG_AutomationAccountId": "/subscriptions/<id>/resourceGroups/<rg>/providers/Microsoft.Automation/automationAccounts/<name>"
+  }
+}

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Adopt existing group</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#F5F5F5;font-family:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,sans-serif;color:#242424}
+a{color:#0F6CBD}a:hover{color:#0C3B5E}
+.nav a{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:6px;color:#242424;text-decoration:none;font-size:14px}
+.nav a:hover{background:#F0F0F0;color:#242424}
+.nav a.on{background:#EBF3FC;color:#0F548C;font-weight:600}
+.card{background:#fff;border:1px solid #E0E0E0;border-radius:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:4px;border:1px solid #D1D1D1;background:#fff;color:#242424;font:inherit;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn.primary{background:#0F6CBD;border-color:#0F6CBD;color:#fff}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.info{background:#EBF3FC;color:#0F548C}
+.off{background:#F5F5F5;color:#616161}
+.muted{color:#616161}
+.lbl{display:block;font-size:13px;font-weight:600;margin-bottom:4px}
+input[type=text]{font:inherit;font-size:14px;height:32px;padding:0 8px;border:1px solid #D1D1D1;border-bottom-color:#616161;border-radius:4px;background:#fff;color:#242424;box-sizing:border-box;width:100%}
+.sw{appearance:none;-webkit-appearance:none;width:40px;height:20px;border-radius:10px;border:1px solid #616161;background:#fff;position:relative;cursor:pointer;margin:0;flex:none}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:12px;height:12px;border-radius:50%;background:#616161}
+.sw:checked{background:#0F6CBD;border-color:#0F6CBD}
+.sw:checked::after{left:23px;background:#fff}
+.seg{display:inline-flex;border:1px solid #D1D1D1;border-radius:4px;overflow:hidden}
+.seg button{border:0;border-right:1px solid #D1D1D1;background:#fff;height:32px;padding:0 12px;font:inherit;font-size:14px;cursor:pointer;color:#242424}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed=true]{background:#EBF3FC;color:#0F548C;font-weight:600}
+.opt{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 12px;border-bottom:1px solid #F0F0F0;font-size:14px}
+.opt:last-child{border-bottom:0}
+.opt[aria-disabled=true]{color:#8A8A8A}
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-direction: column">
+<header style="display: flex; align-items: center; justify-content: space-between; height: 48px; padding: 0 20px; background: #0F6CBD; color: #ffffff">
+<div style="display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5"></path><path d="M16 4.5a3.5 3.5 0 0 1 0 7"></path><path d="M18.5 13.8c1.8.9 3 2.9 3 6.2"></path></svg>
+<span>Dynamic Groups</span>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; font-size: 13px"><span>Admin</span><span style="width: 28px; height: 28px; border-radius: 50%; background: #ffffff; color: #0F548C; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 12px">DM</span></div>
+</header>
+<div style="display: flex; flex-wrap: wrap; flex: 1">
+<nav class="nav" aria-label="Main" style="flex: 1 1 220px; padding: 16px 12px; background: #FAFAFA; border-right: 1px solid #E0E0E0; display: flex; flex-direction: column; gap: 2px; box-sizing: border-box">
+<a class="on" href="Main.dc.html">Groups</a>
+<a href="Activity.dc.html">Activity</a>
+<a href="Audit.dc.html">Audit</a>
+<a href="Settings.dc.html">Settings</a>
+</nav>
+<main style="flex: 999 1 560px; min-width: 0; padding: 24px 32px 40px; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box">
+<div style="font-size: 13px"><a href="Main.dc.html">Groups</a> <span class="muted">/ Board Members</span></div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px"><h1 style="margin: 0; font-size: 24px; font-weight: 600">Board Members</h1><span class="badge info"><span class="dot"></span>Waiting for approval</span></div>
+<div style="display: flex; gap: 8px"><button class="btn" type="button">Save</button><button class="btn primary" type="button">Approve takeover</button></div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+<section class="card" style="flex: 2 1 560px; min-width: 0; padding: 20px; display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Target group</h2>
+<div class="seg" role="group" aria-label="Target group" style="align-self: flex-start"><button type="button" aria-pressed="false">Create new</button><button type="button" aria-pressed="false">Use existing</button><button type="button" aria-pressed="true">Adopt existing</button></div>
+<div>
+<label class="lbl" for="ad-search">Find the group to adopt</label>
+<input id="ad-search" type="text" value="board">
+<div role="listbox" aria-label="Matching groups" style="margin-top: 4px; border: 1px solid #E0E0E0; border-radius: 6px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); background: #ffffff">
+<div class="opt" role="option" aria-selected="true" style="background: #EBF3FC"><span><strong>MESG-Board</strong> <span class="muted">· Mail-enabled security · 13 members</span></span><span class="badge info">Selected</span></div>
+<div class="opt" role="option" aria-disabled="true"><span><strong>SG-Board-OnPrem</strong> · Security · 13 members</span><span class="badge off">Synced from on-prem AD</span></div>
+<div class="opt" role="option" aria-disabled="true"><span><strong>MESG-Board-Assistants</strong> · Mail-enabled security</span><span class="badge off">Linked to “Board Assistants”</span></div>
+<div class="opt" role="option" aria-disabled="true"><span><strong>SG-Board-Admins</strong> · Security · role-assignable</span><span class="badge off">Role-assignable</span></div>
+</div>
+</div>
+<label style="display: flex; align-items: center; gap: 10px; font-size: 14px"><input class="sw" type="checkbox" role="switch" checked>Rename on adopt</label>
+<div style="background: #FAFAFA; border-radius: 6px; padding: 10px 12px; font-size: 14px">Display name becomes <strong>DG-Board Members</strong>. The group ID, mail address and every policy that references the group stay the same.</div>
+</section>
+<section class="card" style="flex: 1 1 340px; min-width: 0; padding: 20px; display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Dry run result</h2>
+<div class="muted" style="font-size: 13px">Forced dry run after adopting · Yesterday 14:10</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; text-align: center">
+<div style="background: #F1FAF1; border-radius: 6px; padding: 10px 4px"><div style="font-size: 22px; font-weight: 600; color: #0E700E">+1</div><div class="muted" style="font-size: 12px">to add</div></div>
+<div style="background: #FDF3F4; border-radius: 6px; padding: 10px 4px"><div style="font-size: 22px; font-weight: 600; color: #B10E1C">−3</div><div class="muted" style="font-size: 12px">to remove</div></div>
+</div>
+<div style="font-size: 14px; display: flex; flex-direction: column; gap: 6px">
+<div style="font-weight: 600">Would be removed</div>
+<div style="display: flex; justify-content: space-between"><span>Former Member A</span><span class="muted">no longer matches</span></div>
+<div style="display: flex; justify-content: space-between"><span>Assistant B</span><span class="muted">added by hand</span></div>
+<div style="display: flex; justify-content: space-between"><span>Guest C</span><span class="muted">guest, excluded by filter</span></div>
+<div class="muted" style="font-size: 13px">1 non-user member (a shared mailbox) is left alone.</div>
+</div>
+<div style="background: #EBF3FC; color: #0F548C; border-radius: 6px; padding: 10px 12px; font-size: 14px">After you approve, the engine owns this group: from then on its members follow the rule, and manual changes are reverted.</div>
+</section>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1120}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

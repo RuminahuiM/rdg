@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.rdg.invalid/cosmos/lock.schema.json",
+  "title": "Run lock (container state)",
+  "description": "One per runbook. Taken with a conditional write, released by deleting it; expiresAt bounds a crashed run.",
+  "type": "object",
+  "$ref": "common.schema.json#/$defs/cosmosSystemProperties",
+  "required": ["id", "pk", "type", "schemaVersion", "jobId", "acquiredAt", "expiresAt"],
+  "unevaluatedProperties": false,
+  "properties": {
+    "id": { "enum": ["lock-Entra", "lock-Exchange"] },
+    "pk": { "const": "lock" },
+    "type": { "const": "lock" },
+    "schemaVersion": { "const": 1 },
+    "jobId": { "$ref": "common.schema.json#/$defs/jobId" },
+    "acquiredAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "expiresAt": { "$ref": "common.schema.json#/$defs/timestamp" }
+  }
+}

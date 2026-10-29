@@ -1,0 +1,176 @@
+# Runs on every pull request and on main. Jobs are added step by step
+# (see the implementation plan); a pull request merges only when all pass.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_call: # release.yml runs the full CI on the tagged commit first
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  powershell:
+    name: powershell lint
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: PSScriptAnalyzer
+        shell: pwsh
+        run: ./tools/Invoke-Lint.ps1
+
+  contracts:
+    name: contracts (JSON schemas, fixtures, OpenAPI)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run contracts:check
+
+  engine:
+    name: engine (Pester, rule conformance)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Pester
+        shell: pwsh
+        run: |
+          # renovate: datasource=nuget registryUrl=https://www.powershellgallery.com/api/v2 depName=Pester
+          $pesterVersion = '5.7.1'
+          Install-Module -Name Pester -RequiredVersion $pesterVersion -Scope CurrentUser -Force
+
+      - name: Rule conformance suite
+        shell: pwsh
+        run: ./tools/Invoke-RuleConformance.ps1
+
+      - name: Build runbooks
+        shell: pwsh
+        run: ./tools/Build-Runbook.ps1 -OutputPath ./out/runbooks
+
+      - name: Build a release bundle (without the web app)
+        shell: pwsh
+        run: ./tools/Build-Release.ps1 -Version 0.0.0-ci -SkipWeb -OutputPath ./out/release-check
+
+      - name: Pester
+        shell: pwsh
+        run: |
+          $config = New-PesterConfiguration
+          $config.Run.Path = @('./tests/DgEngine', './tests/Runbooks', './tests/Api', './tests/Bootstrap', './tests/Deploy', './tests/Tools')
+          $config.Run.Exit = $true
+          $config.Output.Verbosity = 'Detailed'
+          $config.CodeCoverage.Enabled = $true
+          $config.CodeCoverage.Path = @('./src/DgEngine', './src/Api/Modules/DgApi')
+          $config.CodeCoverage.CoveragePercentTarget = 80
+          Invoke-Pester -Configuration $config
+
+  web:
+    name: web (lint, unit, build, e2e)
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: src/Web
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: src/Web/package-lock.json
+
+      - run: npm ci
+
+      - name: Format, lint, types
+        run: |
+          npm run format:check
+          npm run lint
+          npm run typecheck
+
+      - name: Unit tests (also checks the generated contract types)
+        run: npm test
+
+      - name: Production build
+        run: npm run build
+
+      - name: End-to-end tests against the mock build
+        run: |
+          npx playwright install --with-deps chromium
+          npm run build:mock
+          npm run test:e2e
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: src/Web/playwright-report
+          retention-days: 7
+
+  infra:
+    name: infra (OpenTofu, TFLint, plan tests)
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: infra
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: 1.12.6
+          tofu_wrapper: false
+
+      - uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: v0.64.0
+
+      - name: Format and validate
+        run: |
+          tofu fmt -recursive -check
+          tofu init -backend=false -input=false
+          tofu validate
+
+      - name: TFLint (azurerm ruleset)
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          tflint --init
+          tflint --recursive
+
+      - name: Plan the example settings with a mocked provider
+        run: tofu test -var-file=../examples/contoso.tfvars
+
+  security:
+    name: security (Trivy configuration scan, npm audit)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      # The web app's runtime dependencies (what ships to browsers); dev tooling is left to Renovate.
+      - name: npm audit (web app)
+        working-directory: src/Web
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Install Trivy 0.75.0 (checksum pinned)
+        run: |
+          curl -sSfL -o trivy.tgz https://github.com/aquasecurity/trivy/releases/download/v0.75.0/trivy_0.75.0_Linux-64bit.tar.gz
+          echo "c6e65abddb348e25f10549df887045629cf28cc72453cd1c63acb717316b3f3f  trivy.tgz" | sha256sum -c -
+          tar xzf trivy.tgz trivy
+
+      # Accepted findings are marked inline with #trivy:ignore and a reason (see infra/README.md).
+      - name: Scan infra
+        run: ./trivy config --exit-code 1 --severity MEDIUM,HIGH,CRITICAL --tf-vars examples/contoso.tfvars infra

@@ -1,0 +1,196 @@
+# RDG deploy pipeline. Copy this file into your Azure DevOps repo, next to settings/<env>.tfvars,
+# and fill in the variables below once. Upgrading RDG = changing rdgVersion in a pull request.
+#
+# Before the first run (see deploy/README.md):
+#   - bootstrap stage 1 (bootstrap/Initialize-RdgAzure.ps1) printed the backend values and the
+#     pipeline's client ID; the service connection uses workload identity federation,
+#   - an environment named rdg-<environmentName> exists with an approval check, an exclusive
+#     lock and a branch control check (main only).
+#
+# Stages: Plan (fetch the release, verify its checksum, tofu plan) -> Apply (after approval:
+# tofu apply, runbooks, API, web app, smoke test). Reference: CI/CD design, "Deploy pipeline".
+
+trigger:
+  branches:
+    include: [main]
+  paths:
+    include: [azure-pipelines.yml, settings/*]
+
+pr: none
+
+# No two runs at once; the environment's exclusive lock enforces the same for Apply.
+lockBehavior: sequential
+
+variables:
+  # --- Change these -------------------------------------------------------------------------
+  rdgVersion: '1.0.0' # RDG release to deploy (without the v)
+  rdgRepository: 'OWNER/rdg' # GitHub repository that publishes the RDG releases
+  environmentName: 'prod' # same as environment in the settings file
+  settingsFile: 'settings/prod.tfvars'
+  serviceConnectionId: '00000000-0000-0000-0000-000000000000' # ID of the Azure service connection
+  backendResourceGroup: 'rg-rdg-prod-bootstrap' # printed by stage 1
+  backendStorageAccount: 'strdgprodbs0000' # printed by stage 1
+  # --- Usually left as they are ---------------------------------------------------------------
+  tofuVersion: '1.12.6'
+  bundlePath: '$(Pipeline.Workspace)/rdg-bundle'
+  planPath: '$(Pipeline.Workspace)/rdg-plan/rdg.tfplan'
+  outputsPath: '$(Pipeline.Workspace)/rdg-outputs.json'
+
+pool:
+  vmImage: ubuntu-24.04
+
+stages:
+  - stage: Plan
+    jobs:
+      - job: Plan
+        steps:
+          - checkout: self
+
+          - bash: |
+              set -euo pipefail
+              base="https://github.com/$(rdgRepository)/releases/download/v$(rdgVersion)"
+              curl -sSfL -o rdg.zip "$base/rdg-$(rdgVersion).zip"
+              curl -sSfL -o SHA256SUMS "$base/SHA256SUMS"
+              expected=$(awk -v f="rdg-$(rdgVersion).zip" '$2 == f { print $1 }' SHA256SUMS)
+              actual=$(sha256sum rdg.zip | cut -d' ' -f1)
+              if [ -z "$expected" ] || [ "$expected" != "$actual" ]; then
+                echo "##vso[task.logissue type=error]Checksum of rdg-$(rdgVersion).zip doesn't match SHA256SUMS"
+                exit 1
+              fi
+              mkdir -p "$(bundlePath)"
+              unzip -q rdg.zip -d "$(bundlePath)"
+              if [ "$(cat "$(bundlePath)/VERSION")" != "$(rdgVersion)" ]; then
+                echo "##vso[task.logissue type=error]The bundle reports another version"
+                exit 1
+              fi
+              echo "RDG $(rdgVersion) fetched, checksum $actual"
+            displayName: Fetch RDG $(rdgVersion)
+
+          - bash: |
+              set -euo pipefail
+              v="$(tofuVersion)"
+              base="https://github.com/opentofu/opentofu/releases/download/v$v"
+              cd "$(Agent.TempDirectory)"
+              curl -sSfLO "$base/tofu_${v}_linux_amd64.zip"
+              curl -sSfLO "$base/tofu_${v}_SHA256SUMS"
+              grep " tofu_${v}_linux_amd64.zip$" "tofu_${v}_SHA256SUMS" | sha256sum -c -
+              mkdir -p "$(Agent.ToolsDirectory)/tofu"
+              unzip -o -q "tofu_${v}_linux_amd64.zip" tofu -d "$(Agent.ToolsDirectory)/tofu"
+              echo "##vso[task.prependpath]$(Agent.ToolsDirectory)/tofu"
+            displayName: Install OpenTofu $(tofuVersion)
+
+          - task: AzurePowerShell@5
+            displayName: OpenTofu plan
+            inputs:
+              azureSubscription: $(serviceConnectionId)
+              azurePowerShellVersion: LatestVersion
+              pwsh: true
+              ScriptType: FilePath
+              ScriptPath: $(bundlePath)/deploy/Deploy-Rdg.ps1
+              ScriptArguments: >-
+                -Step Plan
+                -BundlePath '$(bundlePath)'
+                -SettingsFile '$(Build.SourcesDirectory)/$(settingsFile)'
+                -Environment '$(environmentName)'
+                -BackendResourceGroup '$(backendResourceGroup)'
+                -BackendStorageAccount '$(backendStorageAccount)'
+                -PlanPath '$(planPath)'
+            env:
+              ARM_ADO_PIPELINE_SERVICE_CONNECTION_ID: $(serviceConnectionId)
+              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+              SYSTEM_OIDCREQUESTURI: $(System.OidcRequestUri)
+
+          - bash: rm -rf "$(bundlePath)/infra/.terraform"
+            displayName: Drop the provider cache from the bundle
+
+          # The plan file is encrypted with the state key; the summary holds resource addresses only.
+          - publish: $(Pipeline.Workspace)/rdg-plan
+            artifact: rdg-plan
+            displayName: Keep the plan
+
+          - publish: $(bundlePath)
+            artifact: rdg-bundle
+            displayName: Keep the bundle
+
+  - stage: Apply
+    dependsOn: Plan
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    jobs:
+      - deployment: Apply
+        # Approval, exclusive lock and branch control are checks on this environment.
+        environment: rdg-${{ variables.environmentName }}
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self # the settings file (state encryption needs it for the apply too)
+
+                - download: current
+                  artifact: rdg-bundle
+                - download: current
+                  artifact: rdg-plan
+
+                - bash: |
+                    set -euo pipefail
+                    v="$(tofuVersion)"
+                    base="https://github.com/opentofu/opentofu/releases/download/v$v"
+                    cd "$(Agent.TempDirectory)"
+                    curl -sSfLO "$base/tofu_${v}_linux_amd64.zip"
+                    curl -sSfLO "$base/tofu_${v}_SHA256SUMS"
+                    grep " tofu_${v}_linux_amd64.zip$" "tofu_${v}_SHA256SUMS" | sha256sum -c -
+                    mkdir -p "$(Agent.ToolsDirectory)/tofu"
+                    unzip -o -q "tofu_${v}_linux_amd64.zip" tofu -d "$(Agent.ToolsDirectory)/tofu"
+                    echo "##vso[task.prependpath]$(Agent.ToolsDirectory)/tofu"
+                  displayName: Install OpenTofu $(tofuVersion)
+
+                - task: AzurePowerShell@5
+                  displayName: OpenTofu apply
+                  inputs:
+                    azureSubscription: $(serviceConnectionId)
+                    azurePowerShellVersion: LatestVersion
+                    pwsh: true
+                    ScriptType: FilePath
+                    ScriptPath: $(bundlePath)/deploy/Deploy-Rdg.ps1
+                    ScriptArguments: >-
+                      -Step Apply
+                      -BundlePath '$(bundlePath)'
+                      -SettingsFile '$(Build.SourcesDirectory)/$(settingsFile)'
+                      -Environment '$(environmentName)'
+                      -BackendResourceGroup '$(backendResourceGroup)'
+                      -BackendStorageAccount '$(backendStorageAccount)'
+                      -PlanPath '$(planPath)'
+                      -OutputsPath '$(outputsPath)'
+                  env:
+                    ARM_ADO_PIPELINE_SERVICE_CONNECTION_ID: $(serviceConnectionId)
+                    SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+                    SYSTEM_OIDCREQUESTURI: $(System.OidcRequestUri)
+
+                - task: AzurePowerShell@5
+                  displayName: Deploy runbooks and API
+                  inputs:
+                    azureSubscription: $(serviceConnectionId)
+                    azurePowerShellVersion: LatestVersion
+                    pwsh: true
+                    ScriptType: FilePath
+                    ScriptPath: $(bundlePath)/deploy/Deploy-Rdg.ps1
+                    ScriptArguments: -Step DeployCode -BundlePath '$(bundlePath)' -OutputsPath '$(outputsPath)'
+
+                - task: AzurePowerShell@5
+                  displayName: Deploy web app
+                  inputs:
+                    azureSubscription: $(serviceConnectionId)
+                    azurePowerShellVersion: LatestVersion
+                    pwsh: true
+                    ScriptType: FilePath
+                    ScriptPath: $(bundlePath)/deploy/Deploy-Rdg.ps1
+                    ScriptArguments: -Step DeployWeb -BundlePath '$(bundlePath)' -OutputsPath '$(outputsPath)'
+
+                - task: AzurePowerShell@5
+                  displayName: Smoke test
+                  inputs:
+                    azureSubscription: $(serviceConnectionId)
+                    azurePowerShellVersion: LatestVersion
+                    pwsh: true
+                    ScriptType: FilePath
+                    ScriptPath: $(bundlePath)/deploy/Deploy-Rdg.ps1
+                    ScriptArguments: -Step SmokeTest -BundlePath '$(bundlePath)' -OutputsPath '$(outputsPath)'

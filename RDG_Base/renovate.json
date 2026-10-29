@@ -1,0 +1,53 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "helpers:pinGitHubActionDigests"
+  ],
+  "schedule": [
+    "before 6am on monday"
+  ],
+  "timezone": "Europe/Zurich",
+  "dependencyDashboard": true,
+  "packageRules": [
+    {
+      "description": "Group npm minor and patch updates; majors come one by one.",
+      "matchManagers": [
+        "npm"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "npm minor and patch"
+    },
+    {
+      "description": "OpenTofu providers and lock file together.",
+      "matchManagers": [
+        "terraform"
+      ],
+      "groupName": "opentofu providers"
+    },
+    {
+      "description": "PowerShell modules from the PowerShell Gallery, one group.",
+      "matchDatasources": [
+        "nuget"
+      ],
+      "groupName": "powershell modules"
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "PowerShell Gallery modules pinned in scripts, workflows and OpenTofu, marked with a '# renovate:' comment on the line above.",
+      "managerFilePatterns": [
+        "/\\.ps1$/",
+        "/\\.ya?ml$/",
+        "/\\.tf$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) registryUrl=(?<registryUrl>\\S+) depName=(?<depName>\\S+)\\s*\\n[^\\n]*?[\"'](?<currentValue>\\d+\\.\\d+\\.\\d+)[\"']"
+      ]
+    }
+  ]
+}

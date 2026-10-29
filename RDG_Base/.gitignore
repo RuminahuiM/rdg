@@ -1,0 +1,50 @@
+# Build and release output
+artifacts/
+out/
+dist/
+coverage/
+TestResults/
+*.zip
+
+# Node
+node_modules/
+*.tsbuildinfo
+
+# Web app test and mock-build output
+dist-mock/
+test-results/
+playwright-report/
+
+# OpenTofu
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+# Real settings files live in the adopter's repo, never here
+*.tfvars
+!examples/*.tfvars
+
+# Azure Functions local settings (may hold connection info)
+local.settings.json
+
+# Secrets and local env
+.env
+.env.*
+
+# Editors and OS
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+
+# API: modules copied in by tools/Build-ApiPackage.ps1 -Local or saved by the pipeline
+src/Api/Modules/DgEngine/
+src/Api/Modules/Microsoft.Graph.Authentication/
+
+# temporary source snapshots for testing
+.rdg-src-*.tgz

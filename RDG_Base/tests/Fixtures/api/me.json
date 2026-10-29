@@ -1,0 +1,12 @@
+{
+  "schema": "Me",
+  "valid": true,
+  "body": {
+    "upn": "alex.example@contoso.org",
+    "roles": [
+      "admin"
+    ],
+    "accessMode": "read-only",
+    "version": "0.1.0"
+  }
+}

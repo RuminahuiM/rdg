@@ -1,0 +1,13 @@
+{
+  "schema": "DefinitionInput",
+  "valid": true,
+  "body": {
+    "name": "Engineering",
+    "groupType": "Distribution",
+    "target": {
+      "mode": "create",
+      "displayName": "Engineering"
+    },
+    "rule": "user.department -eq \"Engineering\""
+  }
+}

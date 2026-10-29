@@ -1,0 +1,10 @@
+extends:
+  - recommended
+rules:
+  # Auth is handled by the Static Web App (cookie session), not by an OpenAPI security scheme.
+  security-defined: off
+  # Internal /roles endpoint and anonymous /health have no 4xx by design.
+  operation-4xx-response: off
+  # Licence is decided before the repo goes public.
+  info-license: off
+  info-license-url: off
