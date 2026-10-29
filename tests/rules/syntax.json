@@ -1,0 +1,777 @@
+{
+  "title": "Rule syntax",
+  "description": "Parser conformance: valid rules with their expected tree (Format-DgRuleAst), invalid rules with the 0-based error position and a message substring. Uses real property names, because Test-DgRule also validates them (see validation.json).",
+  "cases": [
+    {
+      "id": "cmp-eq",
+      "rule": "user.department -eq \"Sales\"",
+      "valid": true,
+      "tree": "(eq user.department \"Sales\")"
+    },
+    {
+      "id": "cmp-ne",
+      "rule": "user.department -ne \"Sales\"",
+      "valid": true,
+      "tree": "(ne user.department \"Sales\")"
+    },
+    {
+      "id": "cmp-startsWith",
+      "rule": "user.department -startsWith \"Sa\"",
+      "valid": true,
+      "tree": "(startsWith user.department \"Sa\")"
+    },
+    {
+      "id": "cmp-notStartsWith",
+      "rule": "user.department -notStartsWith \"Sa\"",
+      "valid": true,
+      "tree": "(notStartsWith user.department \"Sa\")"
+    },
+    {
+      "id": "cmp-endsWith",
+      "rule": "user.mail -endsWith \"@contoso.org\"",
+      "valid": true,
+      "tree": "(endsWith user.mail \"@contoso.org\")"
+    },
+    {
+      "id": "cmp-notEndsWith",
+      "rule": "user.mail -notEndsWith \"@contoso.org\"",
+      "valid": true,
+      "tree": "(notEndsWith user.mail \"@contoso.org\")"
+    },
+    {
+      "id": "cmp-contains",
+      "rule": "user.jobTitle -contains \"Lead\"",
+      "valid": true,
+      "tree": "(contains user.jobTitle \"Lead\")"
+    },
+    {
+      "id": "cmp-notContains",
+      "rule": "user.jobTitle -notContains \"Lead\"",
+      "valid": true,
+      "tree": "(notContains user.jobTitle \"Lead\")"
+    },
+    {
+      "id": "cmp-match",
+      "rule": "user.displayName -match \"^Da.*\"",
+      "valid": true,
+      "tree": "(match user.displayName \"^Da.*\")"
+    },
+    {
+      "id": "cmp-notMatch",
+      "rule": "user.displayName -notMatch \".*vid\"",
+      "valid": true,
+      "tree": "(notMatch user.displayName \".*vid\")"
+    },
+    {
+      "id": "cmp-in",
+      "rule": "user.department -in [\"50001\",\"50002\",\"50003\"]",
+      "valid": true,
+      "tree": "(in user.department [\"50001\" \"50002\" \"50003\"])"
+    },
+    {
+      "id": "cmp-notIn",
+      "rule": "user.department -notIn [\"HR\",\"Legal\"]",
+      "valid": true,
+      "tree": "(notIn user.department [\"HR\" \"Legal\"])"
+    },
+    {
+      "id": "cmp-in-single-quotes",
+      "rule": "user.department -in ['HR','Legal']",
+      "valid": true,
+      "tree": "(in user.department [\"HR\" \"Legal\"])"
+    },
+    {
+      "id": "cmp-in-one-item",
+      "rule": "user.department -in [\"HR\"]",
+      "valid": true,
+      "tree": "(in user.department [\"HR\"])"
+    },
+    {
+      "id": "cmp-in-numbers",
+      "rule": "user.employeeId -in [100, 200]",
+      "valid": true,
+      "tree": "(in user.employeeId [100 200])"
+    },
+    {
+      "id": "cmp-le-date",
+      "rule": "user.employeeHireDate -le 2020-06-10T18:13:20Z",
+      "valid": true,
+      "tree": "(le user.employeeHireDate @2020-06-10T18:13:20Z)"
+    },
+    {
+      "id": "cmp-ge-now",
+      "rule": "user.employeeHireDate -ge system.now",
+      "valid": true,
+      "tree": "(ge user.employeeHireDate now)"
+    },
+    {
+      "id": "cmp-ge-now-plus",
+      "rule": "user.employeehiredate -ge system.now -plus p1d",
+      "valid": true,
+      "tree": "(ge user.employeehiredate now+P1D)",
+      "note": "lower-case duration as in Entra's example"
+    },
+    {
+      "id": "cmp-ge-now-minus",
+      "rule": "user.employeeHireDate -ge system.now -minus P30D",
+      "valid": true,
+      "tree": "(ge user.employeeHireDate now-P30D)"
+    },
+    {
+      "id": "cmp-date-only",
+      "rule": "user.employeeHireDate -ge 2026-01-01",
+      "valid": true,
+      "tree": "(ge user.employeeHireDate @2026-01-01T00:00:00Z)"
+    },
+    {
+      "id": "cmp-bool-true",
+      "rule": "user.accountEnabled -eq true",
+      "valid": true,
+      "tree": "(eq user.accountEnabled true)"
+    },
+    {
+      "id": "cmp-bool-false",
+      "rule": "user.accountEnabled -eq FALSE",
+      "valid": true,
+      "tree": "(eq user.accountEnabled false)"
+    },
+    {
+      "id": "cmp-null",
+      "rule": "user.mail -ne null",
+      "valid": true,
+      "tree": "(ne user.mail null)"
+    },
+    {
+      "id": "cmp-null-eq",
+      "rule": "user.mail -eq null",
+      "valid": true,
+      "tree": "(eq user.mail null)"
+    },
+    {
+      "id": "cmp-null-string",
+      "rule": "user.city -eq \"null\"",
+      "valid": true,
+      "tree": "(eq user.city \"null\")",
+      "note": "quoted null is the text null"
+    },
+    {
+      "id": "cmp-number",
+      "rule": "user.employeeId -eq 4711",
+      "valid": true,
+      "tree": "(eq user.employeeId 4711)"
+    },
+    {
+      "id": "op-no-hyphen",
+      "rule": "user.department eq \"Sales\"",
+      "valid": true,
+      "tree": "(eq user.department \"Sales\")"
+    },
+    {
+      "id": "op-upper-case",
+      "rule": "user.department -EQ \"Sales\"",
+      "valid": true,
+      "tree": "(eq user.department \"Sales\")"
+    },
+    {
+      "id": "op-en-dash",
+      "rule": "user.mail –ne null",
+      "valid": true,
+      "tree": "(ne user.mail null)",
+      "note": "en dash as in Microsoft's documentation"
+    },
+    {
+      "id": "op-mixed-case",
+      "rule": "user.department -STARTSWITH \"Sa\"",
+      "valid": true,
+      "tree": "(startsWith user.department \"Sa\")"
+    },
+    {
+      "id": "prop-any-case",
+      "rule": "User.Department -eq \"Sales\"",
+      "valid": true,
+      "tree": "(eq user.Department \"Sales\")",
+      "note": "property names are case-insensitive in RDG"
+    },
+    {
+      "id": "str-backtick-escape",
+      "rule": "user.department -eq \"Say `\"hi`\"\"",
+      "valid": true,
+      "tree": "(eq user.department \"Say \\\"hi\\\"\")"
+    },
+    {
+      "id": "str-doubled-single",
+      "rule": "user.department -eq 'O''Brien'",
+      "valid": true,
+      "tree": "(eq user.department \"O'Brien\")"
+    },
+    {
+      "id": "str-backtick-form",
+      "rule": "user.department -eq `\"Sales`\"",
+      "valid": true,
+      "tree": "(eq user.department \"\\\"Sales\\\"\")",
+      "note": "Entra's documented form for a value containing quotes"
+    },
+    {
+      "id": "str-empty",
+      "rule": "user.department -eq \"\"",
+      "valid": true,
+      "tree": "(eq user.department \"\")"
+    },
+    {
+      "id": "str-unicode",
+      "rule": "user.city -eq \"Zürich\"",
+      "valid": true,
+      "tree": "(eq user.city \"Zürich\")"
+    },
+    {
+      "id": "str-with-parens",
+      "rule": "user.department -eq \"R&D (Bern)\"",
+      "valid": true,
+      "tree": "(eq user.department \"R&D (Bern)\")"
+    },
+    {
+      "id": "str-with-comma",
+      "rule": "user.department -in [\"A, B\",\"C\"]",
+      "valid": true,
+      "tree": "(in user.department [\"A, B\" \"C\"])"
+    },
+    {
+      "id": "logic-and",
+      "rule": "user.city -eq \"Bern\" -and user.country -eq \"CH\"",
+      "valid": true,
+      "tree": "(and (eq user.city \"Bern\") (eq user.country \"CH\"))"
+    },
+    {
+      "id": "logic-or",
+      "rule": "user.city -eq \"Bern\" -or user.city -eq \"Basel\"",
+      "valid": true,
+      "tree": "(or (eq user.city \"Bern\") (eq user.city \"Basel\"))"
+    },
+    {
+      "id": "logic-and-before-or",
+      "rule": "user.city -eq \"1\" -or user.country -eq \"2\" -and user.department -eq \"3\"",
+      "valid": true,
+      "tree": "(or (eq user.city \"1\") (and (eq user.country \"2\") (eq user.department \"3\")))"
+    },
+    {
+      "id": "logic-parens-override",
+      "rule": "(user.city -eq \"1\" -or user.country -eq \"2\") -and user.department -eq \"3\"",
+      "valid": true,
+      "tree": "(and (or (eq user.city \"1\") (eq user.country \"2\")) (eq user.department \"3\"))"
+    },
+    {
+      "id": "logic-not",
+      "rule": "-not (user.city -eq \"Bern\")",
+      "valid": true,
+      "tree": "(not (eq user.city \"Bern\"))"
+    },
+    {
+      "id": "logic-not-binds-tighter",
+      "rule": "-not user.city -eq \"Bern\" -and user.country -eq \"CH\"",
+      "valid": true,
+      "tree": "(and (not (eq user.city \"Bern\")) (eq user.country \"CH\"))"
+    },
+    {
+      "id": "logic-not-not",
+      "rule": "-not -not (user.city -eq \"Bern\")",
+      "valid": true,
+      "tree": "(not (not (eq user.city \"Bern\")))"
+    },
+    {
+      "id": "logic-words",
+      "rule": "not (user.city -eq \"Bern\") and user.accountEnabled -eq true or user.city -eq \"Basel\"",
+      "valid": true,
+      "tree": "(or (and (not (eq user.city \"Bern\")) (eq user.accountEnabled true)) (eq user.city \"Basel\"))"
+    },
+    {
+      "id": "logic-flat-chain",
+      "rule": "user.city -eq \"1\" -or user.country -eq \"2\" -or user.department -eq \"3\"",
+      "valid": true,
+      "tree": "(or (eq user.city \"1\") (eq user.country \"2\") (eq user.department \"3\"))"
+    },
+    {
+      "id": "logic-deep-parens",
+      "rule": "((((user.city -eq \"1\"))))",
+      "valid": true,
+      "tree": "(eq user.city \"1\")"
+    },
+    {
+      "id": "logic-multiline",
+      "rule": "(user.city -eq \"1\")\n  -or\n(user.country -eq \"2\")",
+      "valid": true,
+      "tree": "(or (eq user.city \"1\") (eq user.country \"2\"))"
+    },
+    {
+      "id": "logic-not-null-in-parens-ok",
+      "rule": "-not (user.mail -eq null -or user.city -eq \"Bern\")",
+      "valid": true,
+      "tree": "(not (or (eq user.mail null) (eq user.city \"Bern\")))",
+      "note": "-not on a group containing null is allowed"
+    },
+    {
+      "id": "coll-any-underscore",
+      "rule": "(user.proxyAddresses -any (_ -startsWith \"contoso\"))",
+      "valid": true,
+      "tree": "(any user.proxyAddresses (startsWith _ \"contoso\"))"
+    },
+    {
+      "id": "coll-any-othermails",
+      "rule": "(user.otherMails -any (_ -endsWith \"@contoso.com\"))",
+      "valid": true,
+      "tree": "(any user.otherMails (endsWith _ \"@contoso.com\"))"
+    },
+    {
+      "id": "coll-assignedplans",
+      "rule": "user.assignedPlans -any (assignedPlan.servicePlanId -eq \"efb87545-963c-4e0d-99df-69c6916d9eb0\" -and assignedPlan.capabilityStatus -eq \"Enabled\")",
+      "valid": true,
+      "tree": "(any user.assignedPlans (and (eq assignedPlan.servicePlanId \"efb87545-963c-4e0d-99df-69c6916d9eb0\") (eq assignedPlan.capabilityStatus \"Enabled\")))"
+    },
+    {
+      "id": "coll-all",
+      "rule": "user.assignedPlans -all (assignedPlan.service -ne \"SCO\" -or assignedPlan.capabilityStatus -ne \"Enabled\")",
+      "valid": true,
+      "tree": "(all user.assignedPlans (or (ne assignedPlan.service \"SCO\") (ne assignedPlan.capabilityStatus \"Enabled\")))"
+    },
+    {
+      "id": "coll-all-null",
+      "rule": "user.assignedPlans -all (assignedPlan.servicePlanId -eq null)",
+      "valid": true,
+      "tree": "(all user.assignedPlans (eq assignedPlan.servicePlanId null))"
+    },
+    {
+      "id": "coll-memberof",
+      "rule": "user.memberOf -any (group.objectId -in ['7c1e2d3f-4a5b-4c6d-8e7f-9a0b1c2d3e4f'])",
+      "valid": true,
+      "tree": "(any user.memberOf (in group.objectId [\"7c1e2d3f-4a5b-4c6d-8e7f-9a0b1c2d3e4f\"]))"
+    },
+    {
+      "id": "coll-memberof-combined",
+      "rule": "user.memberof -any (group.objectId -in [\"7c1e2d3f-4a5b-4c6d-8e7f-9a0b1c2d3e4f\",\"1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d\"]) -and user.accountEnabled -eq true",
+      "valid": true,
+      "tree": "(and (any user.memberof (in group.objectId [\"7c1e2d3f-4a5b-4c6d-8e7f-9a0b1c2d3e4f\" \"1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d\"])) (eq user.accountEnabled true))",
+      "note": "RDG allows memberOf combined with other conditions"
+    },
+    {
+      "id": "coll-assignedplan-case",
+      "rule": "user.assignedPlans -any (AssignedPlan.service -eq \"SCO\")",
+      "valid": true,
+      "tree": "(any user.assignedPlans (eq assignedPlan.service \"SCO\"))"
+    },
+    {
+      "id": "direct-reports",
+      "rule": "Direct Reports for \"aaaaaaaa-0000-1111-2222-bbbbbbbbbbbb\"",
+      "valid": true,
+      "tree": "(directReports aaaaaaaa-0000-1111-2222-bbbbbbbbbbbb)"
+    },
+    {
+      "id": "direct-reports-case",
+      "rule": "direct reports FOR \"aaaaaaaa-0000-1111-2222-bbbbbbbbbbbb\"",
+      "valid": true,
+      "tree": "(directReports aaaaaaaa-0000-1111-2222-bbbbbbbbbbbb)"
+    },
+    {
+      "id": "real-extension-attributes",
+      "rule": "(user.extensionAttribute1 -in [\"MGMT1\",\"MGMT2\",\"OPS\"]) -or (user.extensionAttribute2 -in [\"MGMT1\",\"MGMT2\",\"OPS\"]) -or (user.extensionAttribute3 -startsWith \"OPS\")",
+      "valid": true,
+      "tree": "(or (in user.extensionAttribute1 [\"MGMT1\" \"MGMT2\" \"OPS\"]) (in user.extensionAttribute2 [\"MGMT1\" \"MGMT2\" \"OPS\"]) (startsWith user.extensionAttribute3 \"OPS\"))",
+      "note": "structure of the HEKS EOP rule, invented values"
+    },
+    {
+      "id": "real-directory-extension",
+      "rule": "user.extension_c272a57b722d4eb29bfe327874ae79cb_OfficeNumber -eq \"4711\"",
+      "valid": true,
+      "tree": "(eq user.extension_c272a57b722d4eb29bfe327874ae79cb_OfficeNumber \"4711\")"
+    },
+    {
+      "id": "real-usertype",
+      "rule": "(user.userType -eq \"Member\") -and (user.accountEnabled -eq true) -and (user.department -ne null)",
+      "valid": true,
+      "tree": "(and (eq user.userType \"Member\") (eq user.accountEnabled true) (ne user.department null))"
+    },
+    {
+      "id": "err-empty",
+      "rule": "",
+      "valid": false,
+      "error": {
+        "position": 0,
+        "message": "the rule is empty"
+      }
+    },
+    {
+      "id": "err-blank",
+      "rule": "   ",
+      "valid": false,
+      "error": {
+        "position": 0,
+        "message": "the rule is empty"
+      }
+    },
+    {
+      "id": "err-missing-value",
+      "rule": "(user.department -eq )",
+      "valid": false,
+      "error": {
+        "position": 21,
+        "message": "expected a value after -eq"
+      }
+    },
+    {
+      "id": "err-missing-value-end",
+      "rule": "user.department -eq",
+      "valid": false,
+      "error": {
+        "position": 19,
+        "message": "expected a value after -eq"
+      }
+    },
+    {
+      "id": "err-missing-operator",
+      "rule": "user.department",
+      "valid": false,
+      "error": {
+        "position": 15,
+        "message": "expected an operator such as -eq after user.department"
+      }
+    },
+    {
+      "id": "err-unknown-operator",
+      "rule": "user.department -equals \"Sales\"",
+      "valid": false,
+      "error": {
+        "position": 16,
+        "message": "unknown operator -equals; did you mean -eq?"
+      }
+    },
+    {
+      "id": "err-gt",
+      "rule": "user.employeeHireDate -gt 2020-01-01",
+      "valid": false,
+      "error": {
+        "position": 22,
+        "message": "did you mean -ge?"
+      }
+    },
+    {
+      "id": "err-unquoted-text",
+      "rule": "user.department -eq Sales",
+      "valid": false,
+      "error": {
+        "position": 20,
+        "message": "text values need quotes: \"Sales\""
+      }
+    },
+    {
+      "id": "err-unclosed-string",
+      "rule": "user.department -eq \"Sales",
+      "valid": false,
+      "error": {
+        "position": 20,
+        "message": "is never closed"
+      }
+    },
+    {
+      "id": "err-unclosed-paren",
+      "rule": "(user.department -eq \"Sales\"",
+      "valid": false,
+      "error": {
+        "position": 28,
+        "message": "missing ) to close the ( at column 1"
+      }
+    },
+    {
+      "id": "err-extra-paren",
+      "rule": "user.department -eq \"Sales\")",
+      "valid": false,
+      "error": {
+        "position": 27,
+        "message": "has no matching ("
+      }
+    },
+    {
+      "id": "err-missing-and",
+      "rule": "user.city -eq \"Bern\" user.country -eq \"CH\"",
+      "valid": false,
+      "error": {
+        "position": 21,
+        "message": "is -and or -or missing?"
+      }
+    },
+    {
+      "id": "err-dangling-and",
+      "rule": "user.city -eq \"Bern\" -and",
+      "valid": false,
+      "error": {
+        "position": 25,
+        "message": "expected a condition after -and"
+      }
+    },
+    {
+      "id": "err-double-and",
+      "rule": "user.city -eq \"Bern\" -and -and user.city -eq \"X\"",
+      "valid": false,
+      "error": {
+        "position": 26,
+        "message": "expected a condition after -and"
+      }
+    },
+    {
+      "id": "err-no-property-prefix",
+      "rule": "department -eq \"Sales\"",
+      "valid": false,
+      "error": {
+        "position": 0,
+        "message": "expected a property like user.department"
+      }
+    },
+    {
+      "id": "err-property-no-name",
+      "rule": "user. -eq \"Sales\"",
+      "valid": false,
+      "error": {
+        "position": 0,
+        "message": "missing property name after user."
+      }
+    },
+    {
+      "id": "err-device",
+      "rule": "device.deviceOSType -eq \"Windows\"",
+      "valid": false,
+      "error": {
+        "position": 0,
+        "message": "device rules aren't supported"
+      }
+    },
+    {
+      "id": "err-string-first",
+      "rule": "\"Sales\" -eq user.department",
+      "valid": false,
+      "error": {
+        "position": 0,
+        "message": "expected a property like user.department"
+      }
+    },
+    {
+      "id": "err-not-null",
+      "rule": "-not user.mail -eq null",
+      "valid": false,
+      "error": {
+        "position": 0,
+        "message": "-not can't be used with null"
+      }
+    },
+    {
+      "id": "err-null-with-startswith",
+      "rule": "user.mail -startsWith null",
+      "valid": false,
+      "error": {
+        "position": 22,
+        "message": "null can only be used with -eq or -ne"
+      }
+    },
+    {
+      "id": "err-in-without-list",
+      "rule": "user.department -in \"Sales\"",
+      "valid": false,
+      "error": {
+        "position": 20,
+        "message": "-in needs a list"
+      }
+    },
+    {
+      "id": "err-list-with-eq",
+      "rule": "user.department -eq [\"Sales\"]",
+      "valid": false,
+      "error": {
+        "position": 20,
+        "message": "a list is only allowed with -in and -notIn"
+      }
+    },
+    {
+      "id": "err-empty-list",
+      "rule": "user.department -in []",
+      "valid": false,
+      "error": {
+        "position": 20,
+        "message": "the list is empty"
+      }
+    },
+    {
+      "id": "err-list-unclosed",
+      "rule": "user.department -in [\"A\",\"B\"",
+      "valid": false,
+      "error": {
+        "position": 28,
+        "message": "missing ] to close the list at column 21"
+      }
+    },
+    {
+      "id": "err-list-missing-comma",
+      "rule": "user.department -in [\"A\" \"B\"]",
+      "valid": false,
+      "error": {
+        "position": 25,
+        "message": "expected , or ] in the list"
+      }
+    },
+    {
+      "id": "err-list-null",
+      "rule": "user.department -in [\"A\",null]",
+      "valid": false,
+      "error": {
+        "position": 25,
+        "message": "null is not allowed in a list"
+      }
+    },
+    {
+      "id": "err-list-trailing-comma",
+      "rule": "user.department -in [\"A\",]",
+      "valid": false,
+      "error": {
+        "position": 25,
+        "message": "expected a value in the list"
+      }
+    },
+    {
+      "id": "err-any-no-paren",
+      "rule": "user.proxyAddresses -any _ -startsWith \"x\"",
+      "valid": false,
+      "error": {
+        "position": 25,
+        "message": "expected ( after -any"
+      }
+    },
+    {
+      "id": "err-underscore-outside",
+      "rule": "_ -startsWith \"x\"",
+      "valid": false,
+      "error": {
+        "position": 0,
+        "message": "_ is only valid inside -any or -all"
+      }
+    },
+    {
+      "id": "err-user-inside-any",
+      "rule": "user.proxyAddresses -any (user.mail -eq \"x\")",
+      "valid": false,
+      "error": {
+        "position": 26,
+        "message": "inside -any or -all, refer to the item as _"
+      }
+    },
+    {
+      "id": "err-nested-any",
+      "rule": "user.memberOf -any (_ -any (_ -eq \"x\"))",
+      "valid": false,
+      "error": {
+        "position": 22,
+        "message": "can't be nested"
+      }
+    },
+    {
+      "id": "err-bad-duration",
+      "rule": "user.employeeHireDate -ge system.now -plus 1day",
+      "valid": false,
+      "error": {
+        "position": 43,
+        "message": "is not an ISO 8601 duration"
+      }
+    },
+    {
+      "id": "err-bad-date",
+      "rule": "user.employeeHireDate -ge 2020-13-45",
+      "valid": false,
+      "error": {
+        "position": 26,
+        "message": "is not a valid date"
+      }
+    },
+    {
+      "id": "err-smart-quote",
+      "rule": "user.department -eq “Sales”",
+      "valid": false,
+      "error": {
+        "position": 20,
+        "message": "typographic quote"
+      }
+    },
+    {
+      "id": "err-direct-reports-combined",
+      "rule": "Direct Reports for \"aaaaaaaa-0000-1111-2222-bbbbbbbbbbbb\" -and user.city -eq \"Bern\"",
+      "valid": false,
+      "error": {
+        "position": 58,
+        "message": "can't be combined with other conditions"
+      }
+    },
+    {
+      "id": "err-direct-reports-not-guid",
+      "rule": "Direct Reports for \"Alex\"",
+      "valid": false,
+      "error": {
+        "position": 19,
+        "message": "is not an object ID"
+      }
+    },
+    {
+      "id": "err-operator-as-value",
+      "rule": "user.city -eq -and",
+      "valid": false,
+      "error": {
+        "position": 14,
+        "message": "expected a value after -eq, found -and"
+      }
+    },
+    {
+      "id": "err-and-as-operator",
+      "rule": "user.city -and user.country -eq \"CH\"",
+      "valid": false,
+      "error": {
+        "position": 10,
+        "message": "found -and"
+      }
+    },
+    {
+      "id": "err-system-as-property",
+      "rule": "system.now -ge user.employeeHireDate",
+      "valid": false,
+      "error": {
+        "position": 0,
+        "message": "can only be used as a value"
+      }
+    },
+    {
+      "id": "err-nested-too-deep",
+      "rule": "(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((user.city -eq \"1\")))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))",
+      "valid": false,
+      "error": {
+        "position": 100,
+        "message": "nested more than 100 levels deep"
+      },
+      "note": "protects the host's call stack"
+    },
+    {
+      "id": "nesting-at-limit",
+      "rule": "((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((user.city -eq \"1\"))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))",
+      "valid": true,
+      "tree": "(eq user.city \"1\")"
+    },
+    {
+      "id": "err-not-too-deep",
+      "rule": "-not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not -not (user.city -eq \"1\")",
+      "valid": false,
+      "error": {
+        "position": 500,
+        "message": "nested more than 100 levels deep"
+      }
+    },
+    {
+      "id": "err-unclosed-paren-multiline",
+      "rule": "user.city -eq \"1\"\n-or (user.country -eq \"2\"",
+      "valid": false,
+      "error": {
+        "position": 43,
+        "message": "missing ) to close the ( at line 2, column 5"
+      }
+    }
+  ]
+}

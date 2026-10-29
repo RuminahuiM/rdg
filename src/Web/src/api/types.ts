@@ -1,0 +1,31 @@
+// Short names for the contract types generated from src/Api/openapi.yaml (npm run api:types).
+import type { components } from './schema';
+
+type S = components['schemas'];
+export type Me = S['Me'];
+export type Role = S['Role'];
+export type GroupType = S['GroupType'];
+export type SyncResult = S['SyncResult'];
+export type RunResult = S['Run']['result'];
+export type Definition = S['Definition'];
+export type DefinitionInput = S['DefinitionInput'];
+export type DefinitionPage = S['DefinitionPage'];
+export type Target = S['Target'];
+export type Status = S['Status'];
+export type ApprovalRequest = S['ApprovalRequest'];
+export type SyncAccepted = S['SyncAccepted'];
+export type Run = S['Run'];
+export type RunPage = S['RunPage'];
+export type RuleError = S['RuleError'];
+export type RuleValidationResult = S['RuleValidationResult'];
+export type PreviewInput = S['PreviewInput'];
+export type PreviewResult = S['PreviewResult'];
+export type Settings = S['Settings'];
+export type SettingsInput = S['SettingsInput'];
+export type AuditEntry = S['AuditEntry'];
+export type AuditPage = S['AuditPage'];
+export type DirectoryUser = S['DirectoryUser'];
+export type DirectoryGroup = S['DirectoryGroup'];
+export type UserRef = S['UserRef'];
+export type Problem = S['Problem'];
+export type Provider = S['Provider'];

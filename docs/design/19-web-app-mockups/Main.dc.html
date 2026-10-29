@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Groups</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#F5F5F5;font-family:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,sans-serif;color:#242424}
+a{color:#0F6CBD}a:hover{color:#0C3B5E}
+.nav a{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:6px;color:#242424;text-decoration:none;font-size:14px}
+.nav a:hover{background:#F0F0F0;color:#242424}
+.nav a.on{background:#EBF3FC;color:#0F548C;font-weight:600}
+.card{background:#fff;border:1px solid #E0E0E0;border-radius:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:4px;border:1px solid #D1D1D1;background:#fff;color:#242424;font:inherit;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn.primary{background:#0F6CBD;border-color:#0F6CBD;color:#fff}
+.btn.small{height:28px;padding:0 10px;font-size:13px}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.ok{background:#F1FAF1;color:#0E700E}
+.warn{background:#FDF6F3;color:#8A3707}
+.err{background:#FDF3F4;color:#B10E1C}
+.info{background:#EBF3FC;color:#0F548C}
+.off{background:#F5F5F5;color:#616161}
+.muted{color:#616161}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-weight:600;color:#424242;padding:10px 12px;border-bottom:1px solid #E0E0E0;white-space:nowrap;font-size:13px}
+td{padding:11px 12px;border-bottom:1px solid #F0F0F0;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+input,select{font:inherit;font-size:14px;height:32px;padding:0 8px;border:1px solid #D1D1D1;border-bottom-color:#616161;border-radius:4px;background:#fff;color:#242424;box-sizing:border-box}
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-direction: column">
+<header style="display: flex; align-items: center; justify-content: space-between; height: 48px; padding: 0 20px; background: #0F6CBD; color: #ffffff">
+<div style="display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5"></path><path d="M16 4.5a3.5 3.5 0 0 1 0 7"></path><path d="M18.5 13.8c1.8.9 3 2.9 3 6.2"></path></svg>
+<span>Dynamic Groups</span>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; font-size: 13px">
+<span>Admin</span>
+<span style="width: 28px; height: 28px; border-radius: 50%; background: #ffffff; color: #0F548C; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 12px">DM</span>
+</div>
+</header>
+<div role="status" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 20px; background: #FFF4CE; color: #5C3B00; font-size: 14px; border-bottom: 1px solid #F2D58E">
+<span><strong>Syncing is paused</strong> since 10:15 by Dodoe M. No group changes until it is resumed.</span>
+<button class="btn" type="button">Resume syncing</button>
+</div>
+<div style="display: flex; flex-wrap: wrap; flex: 1">
+<nav class="nav" aria-label="Main" style="flex: 1 1 220px; padding: 16px 12px; background: #FAFAFA; border-right: 1px solid #E0E0E0; display: flex; flex-direction: column; gap: 2px; box-sizing: border-box">
+<a class="on" href="Main.dc.html">Groups</a>
+<a href="Activity.dc.html">Activity</a>
+<a href="Audit.dc.html">Audit</a>
+<a href="Settings.dc.html">Settings</a>
+</nav>
+<main style="flex: 999 1 560px; min-width: 0; padding: 24px 32px 40px; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box">
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px">
+<div>
+<h1 style="margin: 0; font-size: 24px; font-weight: 600">Groups</h1>
+<p class="muted" style="margin: 4px 0 0; font-size: 14px">Rule-based groups, synced by the engine as static members.</p>
+</div>
+<a class="btn primary" href="EditGroup.dc.html">New group</a>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px">
+<div class="card" style="padding: 14px 16px"><div class="muted" style="font-size: 13px">OK</div><div style="font-size: 26px; font-weight: 600; margin-top: 2px">14</div></div>
+<div class="card" style="padding: 14px 16px"><div class="muted" style="font-size: 13px">Warning</div><div style="font-size: 26px; font-weight: 600; margin-top: 2px; color: #8A3707">2</div></div>
+<div class="card" style="padding: 14px 16px"><div class="muted" style="font-size: 13px">Blocked</div><div style="font-size: 26px; font-weight: 600; margin-top: 2px; color: #B10E1C">1</div></div>
+<div class="card" style="padding: 14px 16px"><div class="muted" style="font-size: 13px">Error</div><div style="font-size: 26px; font-weight: 600; margin-top: 2px">0</div></div>
+<div class="card" style="padding: 14px 16px"><div class="muted" style="font-size: 13px">Waiting for approval</div><div style="font-size: 26px; font-weight: 600; margin-top: 2px; color: #0F548C">1</div></div>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 260px; max-width: 360px">
+<label for="g-search" style="font-size: 13px; font-weight: 600">Search</label>
+<input id="g-search" type="search" placeholder="Group name" style="width: 100%">
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<label for="g-type" style="font-size: 13px; font-weight: 600">Type</label>
+<select id="g-type"><option>All types</option><option>Security</option><option>Microsoft 365</option><option>Mail-enabled security</option><option>Distribution list</option></select>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<label for="g-result" style="font-size: 13px; font-weight: 600">Last result</label>
+<select id="g-result"><option>All results</option><option>OK</option><option>Warning</option><option>Blocked</option><option>Error</option></select>
+</div>
+<button class="btn" type="button" aria-pressed="false">Needs attention (2)</button>
+</div>
+<div class="card" style="overflow-x: auto">
+<table>
+<thead>
+<tr><th>Name</th><th>Type</th><th>Target group</th><th>Frequency</th><th>Last result</th><th style="text-align: right">Members</th><th>Last run</th><th>Last sync</th><th><span style="position: absolute; left: -9999px">Actions</span></th></tr>
+</thead>
+<tbody>
+<tr><td><a href="EditGroup.dc.html" style="font-weight: 600">EOP Strict – Management</a></td><td>Mail-enabled security</td><td class="muted">MESG-EOP-Strict</td><td>15 min</td><td><span class="badge ok"><span class="dot"></span>OK</span></td><td style="text-align: right">42</td><td>+1 / −0</td><td class="muted">10:15</td><td><button class="btn small" type="button">Sync now</button></td></tr>
+<tr><td><a href="EditGroup.dc.html" style="font-weight: 600">All Staff Zürich</a></td><td>Security</td><td class="muted">SG-Staff-ZH</td><td>1 h</td><td><span class="badge ok"><span class="dot"></span>OK</span></td><td style="text-align: right">318</td><td>+2 / −1</td><td class="muted">10:00</td><td><button class="btn small" type="button">Sync now</button></td></tr>
+<tr><td><a href="EditGroup.dc.html" style="font-weight: 600">Finance – Distribution</a></td><td>Distribution list</td><td class="muted">DL-Finance</td><td>1 h</td><td><span class="badge warn"><span class="dot"></span>Warning</span></td><td style="text-align: right">27</td><td>+0 / −0, 3 skipped</td><td class="muted">10:00</td><td><button class="btn small" type="button">Sync now</button></td></tr>
+<tr><td><a href="EditGroup.dc.html" style="font-weight: 600">Intune – Field Laptops</a></td><td>Security</td><td class="muted">SG-Intune-Field</td><td>15 min</td><td><span class="badge err"><span class="dot"></span>Blocked: change limit</span></td><td style="text-align: right">150</td><td>+88 / −0 held</td><td class="muted">10:15</td><td><button class="btn small" type="button">Review</button></td></tr>
+<tr><td><a href="EditGroup.dc.html" style="font-weight: 600">Country Offices</a></td><td>Microsoft 365</td><td class="muted">M365-Country-Offices</td><td>6 h</td><td><span class="badge ok"><span class="dot"></span>OK</span></td><td style="text-align: right">154</td><td>+0 / −2</td><td class="muted">06:00</td><td><button class="btn small" type="button">Sync now</button></td></tr>
+<tr><td><a href="EditGroup.dc.html" style="font-weight: 600">Board Members</a></td><td>Mail-enabled security</td><td class="muted">MESG-Board (adopted)</td><td>24 h</td><td><span class="badge info"><span class="dot"></span>Waiting for approval</span></td><td style="text-align: right">11</td><td>Dry run: +1 / −3</td><td class="muted">Yesterday</td><td><button class="btn small" type="button">Review</button></td></tr>
+<tr><td><a href="EditGroup.dc.html" style="font-weight: 600">Project Teams South</a></td><td>Security</td><td class="muted">New group</td><td>1 h</td><td><span class="badge info"><span class="dot"></span>Dry run</span></td><td style="text-align: right">0</td><td>Would add 64</td><td class="muted">10:00</td><td><button class="btn small" type="button">Sync now</button></td></tr>
+<tr><td><a href="EditGroup.dc.html" style="font-weight: 600">Service Accounts</a></td><td>Security</td><td class="muted">SG-SVC</td><td>1 h</td><td><span class="badge off"><span class="dot"></span>Disabled</span></td><td style="text-align: right">9</td><td class="muted">–</td><td class="muted">2 Oct</td><td><button class="btn small" type="button">Enable</button></td></tr>
+</tbody>
+</table>
+</div>
+<p class="muted" style="margin: 0; font-size: 13px">Showing 8 of 18 groups. Next scheduled run at 10:30.</p>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":960}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+{
+  "id": "aud-01JA9P2X4C5D6E7F8G9H0J1K2M", "pk": "def-01JA7K3M9QXR4T6V8W0Y2Z4B6D", "type": "audit", "schemaVersion": 1,
+  "at": "2026-10-08T16:40:00Z", "by": "sam.sample@contoso.org",
+  "action": "update", "definitionName": "EOP Strict – Management",
+  "changes": [ { "field": "rule", "old": "user.department -eq \"Ops\"", "new": "user.department -startsWith \"Ops\"" } ],
+  "ttl": 5184000
+}

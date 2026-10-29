@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.rdg.invalid/cosmos/settings.schema.json",
+  "title": "Settings (container config)",
+  "description": "Exactly one document, id and pk \"settings\". Written only by the API.",
+  "type": "object",
+  "$ref": "common.schema.json#/$defs/cosmosSystemProperties",
+  "required": [
+    "id", "pk", "type", "schemaVersion", "paused", "pausedAt", "pausedBy", "verboseLogging",
+    "changeLimitPercent", "changeLimitMinChanges", "newGroupsDryRun", "nestedMembers",
+    "frequencyOptions", "naming", "marker", "auditRetentionDays", "updatedAt", "updatedBy"
+  ],
+  "unevaluatedProperties": false,
+  "properties": {
+    "id": { "const": "settings" },
+    "pk": { "const": "settings" },
+    "type": { "const": "settings" },
+    "schemaVersion": { "const": 1 },
+    "paused": { "type": "boolean", "description": "Pause switch for both runbooks." },
+    "pausedAt": { "oneOf": [{ "$ref": "common.schema.json#/$defs/timestamp" }, { "type": "null" }] },
+    "pausedBy": { "oneOf": [{ "$ref": "common.schema.json#/$defs/upn" }, { "type": "null" }] },
+    "verboseLogging": { "type": "boolean" },
+    "changeLimitPercent": { "type": "integer", "minimum": 1, "maximum": 100, "default": 50 },
+    "changeLimitMinChanges": { "type": "integer", "minimum": 0, "maximum": 10000, "default": 10 },
+    "newGroupsDryRun": { "type": "boolean", "default": true },
+    "nestedMembers": { "type": "boolean", "default": true, "description": "Include nested members of groups RDG does not manage." },
+    "frequencyOptions": {
+      "type": "array",
+      "items": { "type": "integer", "minimum": 3, "maximum": 1440 },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "naming": {
+      "type": "object",
+      "required": ["prefix", "suffix"],
+      "additionalProperties": false,
+      "properties": {
+        "prefix": { "$ref": "#/$defs/affix" },
+        "suffix": { "$ref": "#/$defs/affix" }
+      }
+    },
+    "marker": {
+      "description": "Optional marker on managed groups, in addition to the registry.",
+      "type": "object",
+      "required": ["enabled", "exchangeCustomAttribute"],
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "exchangeCustomAttribute": { "type": "integer", "minimum": 1, "maximum": 15 }
+      }
+    },
+    "auditRetentionDays": { "type": "integer", "minimum": 1, "maximum": 3650, "default": 60 },
+    "updatedAt": { "oneOf": [{ "$ref": "common.schema.json#/$defs/timestamp" }, { "type": "null" }] },
+    "updatedBy": { "oneOf": [{ "$ref": "common.schema.json#/$defs/upn" }, { "type": "null" }] }
+  },
+  "$defs": {
+    "affix": {
+      "type": "object",
+      "required": ["enabled", "text"],
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "text": { "type": "string", "maxLength": 20 }
+      }
+    }
+  }
+}

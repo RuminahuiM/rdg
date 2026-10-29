@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.rdg.invalid/cosmos/run.schema.json",
+  "title": "Run record (container runs)",
+  "description": "Written only by the engine. One per definition and run that changed something, warned, failed or ran dry; plus one per skipped or paused tick (pk = system). Quiet runs leave none. Container default TTL 30 days.",
+  "type": "object",
+  "$ref": "common.schema.json#/$defs/cosmosSystemProperties",
+  "required": ["id", "pk", "type", "schemaVersion", "jobId", "runbook", "mode", "startedAt", "durationMs", "result", "engineVersion"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^run-[0-9a-f-]{36}-(def-[0-9A-HJKMNP-TV-Z]{26}|system)$" },
+    "type": { "const": "run" },
+    "schemaVersion": { "const": 1 },
+    "jobId": { "$ref": "common.schema.json#/$defs/jobId" },
+    "runbook": { "$ref": "common.schema.json#/$defs/provider" },
+    "mode": { "enum": ["Scheduled", "SyncNow"] },
+    "startedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "durationMs": { "type": "integer", "minimum": 0 },
+    "engineVersion": { "type": "string" }
+  },
+  "oneOf": [
+    {
+      "title": "Definition run",
+      "required": [
+        "definitionName", "result", "dryRun", "dryRunReason", "addedCount", "removedCount", "skippedCount",
+        "added", "removed", "excluded", "manualChangesReverted", "warnings", "error", "compare"
+      ],
+      "properties": {
+        "pk": { "$ref": "common.schema.json#/$defs/definitionId" },
+        "definitionName": { "type": "string", "maxLength": 120 },
+        "groupId": { "oneOf": [{ "$ref": "common.schema.json#/$defs/objectId" }, { "type": "null" }] },
+        "result": { "$ref": "common.schema.json#/$defs/syncResult" },
+        "dryRun": { "type": "boolean" },
+        "dryRunReason": { "oneOf": [{ "$ref": "common.schema.json#/$defs/dryRunReason" }, { "type": "null" }] },
+        "addedCount": { "type": "integer", "minimum": 0 },
+        "removedCount": { "type": "integer", "minimum": 0 },
+        "skippedCount": { "type": "integer", "minimum": 0 },
+        "added": { "$ref": "#/$defs/userList" },
+        "removed": { "$ref": "#/$defs/userList" },
+        "skipped": { "$ref": "#/$defs/userList" },
+        "excluded": { "$ref": "common.schema.json#/$defs/excludedCounts" },
+        "manualChangesReverted": {
+          "type": "object",
+          "required": ["added", "removed"],
+          "additionalProperties": false,
+          "properties": {
+            "added": { "type": "integer", "minimum": 0 },
+            "removed": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "then": {
+          "description": "Dry runs only: what a real run would have done (read-write access, dry run off).",
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "required": ["result", "message", "approvalKind"],
+              "additionalProperties": false,
+              "properties": {
+                "result": { "$ref": "common.schema.json#/$defs/syncResult" },
+                "message": { "type": ["string", "null"], "maxLength": 4000 },
+                "approvalKind": { "oneOf": [{ "enum": ["adopt", "changeLimit"] }, { "type": "null" }] }
+              }
+            }
+          ]
+        },
+        "approval": {
+          "description": "Approval the run waited for (pendingApproval) or used.",
+          "oneOf": [{ "$ref": "common.schema.json#/$defs/approvalRequest" }, { "type": "null" }]
+        },
+        "warnings": { "type": "array", "items": { "type": "string", "maxLength": 1000 } },
+        "error": { "type": ["string", "null"], "maxLength": 4000 },
+        "compare": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "required": ["groupId", "onlyInRdgCount", "onlyInCompareCount", "onlyInRdg", "onlyInCompare"],
+              "additionalProperties": false,
+              "properties": {
+                "groupId": { "$ref": "common.schema.json#/$defs/objectId" },
+                "onlyInRdgCount": { "type": "integer", "minimum": 0 },
+                "onlyInCompareCount": { "type": "integer", "minimum": 0 },
+                "onlyInRdg": { "$ref": "#/$defs/userList" },
+                "onlyInCompare": { "$ref": "#/$defs/userList" }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "title": "Skipped or paused tick",
+      "required": ["result"],
+      "properties": {
+        "pk": { "const": "system" },
+        "result": { "enum": ["SkippedTick", "Paused"] },
+        "reason": { "type": "string", "maxLength": 1000 }
+      }
+    }
+  ],
+  "unevaluatedProperties": false,
+  "$defs": {
+    "userList": {
+      "description": "At most 500 entries; the matching *Count field is always complete.",
+      "type": "array",
+      "maxItems": 500,
+      "items": { "$ref": "common.schema.json#/$defs/userRef" }
+    }
+  }
+}

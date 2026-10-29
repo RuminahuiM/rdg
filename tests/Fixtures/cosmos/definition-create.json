@@ -1,0 +1,15 @@
+{
+  "id": "def-01JA9Q0RSTVWXYZ0123456789A", "pk": "def-01JA9Q0RSTVWXYZ0123456789A", "type": "definition", "schemaVersion": 1,
+  "name": "All engineering staff",
+  "groupType": "Distribution",
+  "target": { "mode": "create", "displayName": "Engineering", "mailNickname": "engineering" },
+  "rule": "user.department -eq \"Engineering\"",
+  "includeUserIds": [], "excludeUserIds": [],
+  "includeDisabled": false, "includeGuests": false,
+  "frequencyMinutes": 60, "enabled": true, "dryRun": false,
+  "changeLimitPercent": 30, "allowEmpty": false, "compareGroupId": null,
+  "syncRequest": null,
+  "approval": { "kind": "changeLimit", "diffHash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "adds": 88, "removes": 0, "by": "alex.example@contoso.org", "at": "2026-10-09T11:00:00Z" },
+  "createdAt": "2026-10-08T08:00:00Z", "createdBy": "alex.example@contoso.org",
+  "updatedAt": "2026-10-09T11:00:00Z", "updatedBy": "alex.example@contoso.org"
+}

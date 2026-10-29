@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.rdg.invalid/cosmos/status.schema.json",
+  "title": "Status (container state)",
+  "description": "One per definition. Written only by the engine; the API merges it into its responses.",
+  "type": "object",
+  "$ref": "common.schema.json#/$defs/cosmosSystemProperties",
+  "required": [
+    "id", "pk", "type", "schemaVersion", "groupId", "lastSyncUtc", "lastResult", "dryRunReason",
+    "memberCount", "added", "removed", "skipped", "excluded", "lastError", "lastRunId",
+    "handledSyncRequestAt", "pendingApproval", "usedApprovalHash", "lastWrittenMembersHash", "compare"
+  ],
+  "unevaluatedProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^status-def-[0-9A-HJKMNP-TV-Z]{26}$" },
+    "pk": { "$ref": "common.schema.json#/$defs/definitionId" },
+    "type": { "const": "status" },
+    "schemaVersion": { "const": 1 },
+    "groupId": {
+      "description": "The group the engine manages; for target.mode = create the only place its ID is stored. null until created (or in read-only mode).",
+      "oneOf": [{ "$ref": "common.schema.json#/$defs/objectId" }, { "type": "null" }]
+    },
+    "lastSyncUtc": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "lastResult": { "$ref": "common.schema.json#/$defs/syncResult" },
+    "dryRunReason": { "oneOf": [{ "$ref": "common.schema.json#/$defs/dryRunReason" }, { "type": "null" }] },
+    "memberCount": { "type": "integer", "minimum": 0 },
+    "added": { "type": "integer", "minimum": 0 },
+    "removed": { "type": "integer", "minimum": 0 },
+    "skipped": { "type": "integer", "minimum": 0 },
+    "excluded": { "$ref": "common.schema.json#/$defs/excludedCounts" },
+    "warnings": { "type": "array", "items": { "type": "string" } },
+    "lastError": { "type": ["string", "null"], "maxLength": 2000 },
+    "lastRunId": { "type": ["string", "null"] },
+    "handledSyncRequestAt": { "oneOf": [{ "$ref": "common.schema.json#/$defs/timestamp" }, { "type": "null" }] },
+    "pendingApproval": { "oneOf": [{ "$ref": "common.schema.json#/$defs/approvalRequest" }, { "type": "null" }] },
+    "usedApprovalHash": { "oneOf": [{ "$ref": "common.schema.json#/$defs/sha256" }, { "type": "null" }] },
+    "lastWrittenMembersHash": { "oneOf": [{ "$ref": "common.schema.json#/$defs/sha256" }, { "type": "null" }] },
+    "compare": {
+      "description": "Counts against the compare group; null when the definition has none.",
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "required": ["groupId", "onlyInRdg", "onlyInCompare"],
+          "additionalProperties": false,
+          "properties": {
+            "groupId": { "$ref": "common.schema.json#/$defs/objectId" },
+            "onlyInRdg": { "type": "integer", "minimum": 0 },
+            "onlyInCompare": { "type": "integer", "minimum": 0 }
+          }
+        }
+      ]
+    }
+  }
+}

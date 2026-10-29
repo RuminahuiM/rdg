@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.rdg.invalid/cosmos/heartbeat.schema.json",
+  "title": "Heartbeat (container state)",
+  "description": "One per runbook, overwritten every tick, also when paused. The web app warns when it is older than three ticks.",
+  "type": "object",
+  "$ref": "common.schema.json#/$defs/cosmosSystemProperties",
+  "required": ["id", "pk", "type", "schemaVersion", "runbook", "at", "jobId", "engineVersion", "paused", "accessMode"],
+  "unevaluatedProperties": false,
+  "properties": {
+    "id": { "enum": ["heartbeat-Entra", "heartbeat-Exchange"] },
+    "pk": { "const": "system" },
+    "type": { "const": "heartbeat" },
+    "schemaVersion": { "const": 1 },
+    "runbook": { "$ref": "common.schema.json#/$defs/provider" },
+    "at": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "jobId": { "$ref": "common.schema.json#/$defs/jobId" },
+    "engineVersion": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?$" },
+    "paused": { "type": "boolean" },
+    "accessMode": { "enum": ["read-only", "read-write"] },
+    "userCount": {
+      "description": "Users in the last healthy snapshot; the next run refuses a snapshot below 80 % of it (from 20 users up).",
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}

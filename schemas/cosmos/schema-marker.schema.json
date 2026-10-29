@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.rdg.invalid/cosmos/schema-marker.schema.json",
+  "title": "Schema marker (one per container)",
+  "description": "Guards a bulk upgrade so it runs once. Written by the container's owner only: the API in config, the engine in state and runs.",
+  "type": "object",
+  "$ref": "common.schema.json#/$defs/cosmosSystemProperties",
+  "required": ["id", "pk", "type", "schemaVersion", "upgradedTo", "upgradedAt", "upgradedByVersion"],
+  "unevaluatedProperties": false,
+  "properties": {
+    "id": { "const": "schema" },
+    "pk": { "const": "system" },
+    "type": { "const": "schema" },
+    "schemaVersion": { "const": 1 },
+    "upgradedTo": { "type": "integer", "minimum": 1, "description": "Highest document schemaVersion in this container after the upgrade." },
+    "upgradedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "upgradedByVersion": { "type": "string" }
+  }
+}

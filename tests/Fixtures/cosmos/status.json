@@ -1,0 +1,13 @@
+{
+  "id": "status-def-01JA7K3M9QXR4T6V8W0Y2Z4B6D", "pk": "def-01JA7K3M9QXR4T6V8W0Y2Z4B6D", "type": "status", "schemaVersion": 1,
+  "groupId": "0b7d2c1e-5a4f-4e3b-9c8d-7f6e5d4c3b2a",
+  "lastSyncUtc": "2026-10-09T10:15:22Z", "lastResult": "OK", "dryRunReason": null,
+  "memberCount": 42, "added": 1, "removed": 0, "skipped": 0,
+  "excluded": { "disabled": 2, "guests": 1 },
+  "warnings": ["2 disabled accounts and 1 guest excluded"],
+  "lastError": null, "lastRunId": "run-5c1e2d3f-4a5b-4c6d-8e7f-9a0b1c2d3e4f-def-01JA7K3M9QXR4T6V8W0Y2Z4B6D",
+  "handledSyncRequestAt": "2026-10-09T09:52:00Z",
+  "pendingApproval": null, "usedApprovalHash": null,
+  "lastWrittenMembersHash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "compare": { "groupId": "4c3b2a1f-0e9d-4c8b-a7f6-e5d4c3b2a1f0", "onlyInRdg": 0, "onlyInCompare": 1 }
+}

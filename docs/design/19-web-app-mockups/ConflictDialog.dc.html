@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Edit conflict</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;font-family:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,sans-serif;color:#242424}
+.btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 14px;border-radius:4px;border:1px solid #D1D1D1;background:#fff;color:#242424;font:inherit;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
+.btn.primary{background:#0F6CBD;border-color:#0F6CBD;color:#fff}
+.muted{color:#616161}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-weight:600;color:#424242;padding:8px 10px;border-bottom:1px solid #E0E0E0}
+td{padding:10px;border-bottom:1px solid #F0F0F0;vertical-align:top}
+.mono{font-family:"Cascadia Code",Consolas,ui-monospace,monospace;font-size:12.5px}
+.old{background:#FDF3F4;color:#6E0811;padding:1px 4px;border-radius:3px}
+.new{background:#F1FAF1;color:#0A5A0A;padding:1px 4px;border-radius:3px}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; position: relative; background: #F5F5F5; overflow: hidden">
+<div style="height: 48px; background: #0F6CBD"></div>
+<div style="display: flex; height: 852px">
+<div style="width: 220px; background: #FAFAFA; border-right: 1px solid #E0E0E0"></div>
+<div style="flex: 1; padding: 24px 32px; display: flex; flex-direction: column; gap: 16px">
+<div style="height: 28px; width: 320px; background: #E6E6E6; border-radius: 4px"></div>
+<div style="height: 520px; background: #ffffff; border: 1px solid #E0E0E0; border-radius: 8px"></div>
+</div>
+</div>
+<div style="position: absolute; inset: 0; background: rgba(0, 0, 0, 0.4); display: flex; align-items: center; justify-content: center">
+<div role="dialog" aria-modal="true" aria-labelledby="cf-title" style="width: 640px; background: #ffffff; border-radius: 8px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.24); padding: 24px; display: flex; flex-direction: column; gap: 16px">
+<div>
+<h2 id="cf-title" style="margin: 0; font-size: 20px; font-weight: 600">Someone else changed this group</h2>
+<p class="muted" style="margin: 4px 0 0; font-size: 14px">Lea Keller saved EOP Strict – Management at 14:02 while you were editing. Your changes were not saved and are still in the form.</p>
+</div>
+<table>
+<thead><tr><th>Field</th><th>Saved by Lea Keller</th><th>Your edit</th></tr></thead>
+<tbody>
+<tr><td style="font-weight: 600">Rule</td><td class="mono"><span class="old">… -in ["STIFTRAT","DIR1","DIR2","KOM","GPK"]</span></td><td class="mono"><span class="new">… -in ["STIFTRAT","DIR1","DIR2","KOM","GPK","GC1"]</span></td></tr>
+<tr><td style="font-weight: 600">Frequency</td><td><span class="old">15 min</span></td><td><span class="new">30 min</span></td></tr>
+<tr><td style="font-weight: 600">Always exclude</td><td>svc-backup, <span class="old">test.user</span></td><td>svc-backup</td></tr>
+</tbody>
+</table>
+<div style="background: #FAFAFA; border-radius: 6px; padding: 12px; font-size: 14px">Reload takes Lea's version; you can then apply your changes again on top. Overwriting someone else's save is not possible.</div>
+<div style="display: flex; justify-content: flex-end; gap: 8px">
+<button class="btn" type="button">Back to my edits</button>
+<button class="btn primary" type="button">Reload latest version</button>
+</div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

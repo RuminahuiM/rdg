@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.rdg.invalid/cosmos/common.schema.json",
+  "title": "Shared definitions for RDG Cosmos DB documents",
+  "$defs": {
+    "definitionId": {
+      "description": "\"def-\" plus a ULID (26 Crockford base32 characters), sortable by creation time.",
+      "type": "string",
+      "pattern": "^def-[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "ulid": {
+      "type": "string",
+      "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+    },
+    "objectId": {
+      "description": "Entra object ID (GUID).",
+      "type": "string",
+      "format": "uuid"
+    },
+    "jobId": {
+      "description": "Azure Automation job ID (GUID).",
+      "type": "string",
+      "format": "uuid"
+    },
+    "upn": {
+      "description": "User principal name of a person who acted (audit, approvals).",
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 256,
+      "pattern": "^[^@\\s]+@[^@\\s]+$"
+    },
+    "timestamp": {
+      "description": "UTC, ISO 8601.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "schemaVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "groupType": {
+      "enum": ["Security", "Microsoft365", "MailEnabledSecurity", "Distribution"]
+    },
+    "provider": {
+      "description": "Which runbook handles a group type: Entra (Security, Microsoft365) or Exchange (MailEnabledSecurity, Distribution).",
+      "enum": ["Entra", "Exchange"]
+    },
+    "syncResult": {
+      "enum": ["OK", "Warning", "Blocked", "Error", "DryRun", "WaitingForApproval"]
+    },
+    "dryRunReason": {
+      "description": "Why a run did not write: the definition's own dry-run switch, a new group's first run, the forced dry run after adoption, or a read-only installation.",
+      "enum": ["definition", "newGroup", "adoption", "readOnly"]
+    },
+    "userRef": {
+      "type": "object",
+      "required": ["id", "upn"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/objectId" },
+        "upn": { "type": "string", "maxLength": 256 },
+        "displayName": { "type": "string", "maxLength": 256 }
+      }
+    },
+    "excludedCounts": {
+      "type": "object",
+      "required": ["disabled", "guests"],
+      "additionalProperties": false,
+      "properties": {
+        "disabled": { "type": "integer", "minimum": 0 },
+        "guests": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "approvalRequest": {
+      "description": "Written by the engine into status.pendingApproval when it waits for a human.",
+      "type": "object",
+      "required": ["kind", "diffHash", "adds", "removes", "percent"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "enum": ["changeLimit", "adopt"] },
+        "diffHash": { "$ref": "#/$defs/sha256" },
+        "adds": { "type": "integer", "minimum": 0 },
+        "removes": { "type": "integer", "minimum": 0 },
+        "percent": { "type": "number", "minimum": 0 },
+        "detectedAt": { "$ref": "#/$defs/timestamp" }
+      }
+    },
+    "cosmosSystemProperties": {
+      "description": "Properties Cosmos DB adds itself, plus the per-item ttl. Allowed on every document.",
+      "type": "object",
+      "properties": {
+        "_rid": { "type": "string" },
+        "_self": { "type": "string" },
+        "_etag": { "type": "string" },
+        "_attachments": { "type": "string" },
+        "_ts": { "type": "integer" },
+        "ttl": { "type": "integer", "minimum": -1 }
+      }
+    }
+  }
+}
