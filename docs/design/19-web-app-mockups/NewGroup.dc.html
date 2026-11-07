@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>New group</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#F5F5F5;font-family:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,sans-serif;color:#242424}
+a{color:#0F6CBD}a:hover{color:#0C3B5E}
+.nav a{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:6px;color:#242424;text-decoration:none;font-size:14px}
+.nav a:hover{background:#F0F0F0;color:#242424}
+.nav a.on{background:#EBF3FC;color:#0F548C;font-weight:600}
+.card{background:#fff;border:1px solid #E0E0E0;border-radius:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:4px;border:1px solid #D1D1D1;background:#fff;color:#242424;font:inherit;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn.primary{background:#0F6CBD;border-color:#0F6CBD;color:#fff}
+.muted{color:#616161}
+.lbl{display:block;font-size:13px;font-weight:600;margin-bottom:4px}
+input[type=text],select{font:inherit;font-size:14px;height:32px;padding:0 8px;border:1px solid #D1D1D1;border-bottom-color:#616161;border-radius:4px;background:#fff;color:#242424;box-sizing:border-box;width:100%}
+.sw{appearance:none;-webkit-appearance:none;width:40px;height:20px;border-radius:10px;border:1px solid #616161;background:#fff;position:relative;cursor:pointer;margin:0;flex:none}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:12px;height:12px;border-radius:50%;background:#616161}
+.sw:checked{background:#0F6CBD;border-color:#0F6CBD}
+.sw:checked::after{left:23px;background:#fff}
+.seg{display:inline-flex;border:1px solid #D1D1D1;border-radius:4px;overflow:hidden}
+.seg button{border:0;border-right:1px solid #D1D1D1;background:#fff;height:32px;padding:0 12px;font:inherit;font-size:14px;cursor:pointer;color:#242424}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed=true]{background:#EBF3FC;color:#0F548C;font-weight:600}
+.code{font-family:"Cascadia Code",Consolas,ui-monospace,monospace;font-size:13px;line-height:22px}
+.p{color:#0F548C}.o{color:#7A2E8E}.s{color:#0E700E}
+.step{display:flex;gap:10px;font-size:14px}
+.num{width:22px;height:22px;border-radius:50%;background:#EBF3FC;color:#0F548C;font-size:12px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;flex:none}
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-direction: column">
+<header style="display: flex; align-items: center; justify-content: space-between; height: 48px; padding: 0 20px; background: #0F6CBD; color: #ffffff">
+<div style="display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5"></path><path d="M16 4.5a3.5 3.5 0 0 1 0 7"></path><path d="M18.5 13.8c1.8.9 3 2.9 3 6.2"></path></svg>
+<span>Dynamic Groups</span>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; font-size: 13px"><span>Admin</span><span style="width: 28px; height: 28px; border-radius: 50%; background: #ffffff; color: #0F548C; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 12px">DM</span></div>
+</header>
+<div style="display: flex; flex-wrap: wrap; flex: 1">
+<nav class="nav" aria-label="Main" style="flex: 1 1 220px; padding: 16px 12px; background: #FAFAFA; border-right: 1px solid #E0E0E0; display: flex; flex-direction: column; gap: 2px; box-sizing: border-box">
+<a class="on" href="Main.dc.html">Groups</a>
+<a href="Activity.dc.html">Activity</a>
+<a href="Audit.dc.html">Audit</a>
+<a href="Settings.dc.html">Settings</a>
+</nav>
+<main style="flex: 999 1 560px; min-width: 0; padding: 24px 32px 40px; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box">
+<div style="font-size: 13px"><a href="Main.dc.html">Groups</a> <span class="muted">/ New group</span></div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<h1 style="margin: 0; font-size: 24px; font-weight: 600">New group</h1>
+<div style="display: flex; gap: 8px"><a class="btn" href="Main.dc.html">Cancel</a><button class="btn primary" type="button">Create</button></div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+<div style="flex: 2 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+<section class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Basics</h2>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+<div><label class="lbl" for="n-name">Name</label><input id="n-name" type="text" value="Project Teams South"></div>
+<div><label class="lbl" for="n-type">Group type</label><select id="n-type"><option>Security</option><option>Microsoft 365</option><option>Mail-enabled security</option><option>Distribution list</option></select></div>
+</div>
+<div>
+<span class="lbl">Target group</span>
+<div class="seg" role="group" aria-label="Target group"><button type="button" aria-pressed="true">Create new</button><button type="button" aria-pressed="false">Use existing</button><button type="button" aria-pressed="false">Adopt existing</button></div>
+<div style="margin-top: 10px; background: #FAFAFA; border-radius: 6px; padding: 10px 12px; font-size: 14px">The engine creates the security group <strong>DG-Project Teams South</strong> on the first run. The prefix comes from Settings.</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: end">
+<div><label class="lbl" for="n-freq">Frequency</label><select id="n-freq"><option>1 h</option><option>15 min</option><option>6 h</option><option>24 h</option></select></div>
+<label style="display: flex; align-items: center; gap: 10px; font-size: 14px; height: 32px"><input class="sw" type="checkbox" role="switch" checked>Enabled</label>
+<label style="display: flex; align-items: center; gap: 10px; font-size: 14px; height: 32px"><input class="sw" type="checkbox" role="switch" checked>Dry run</label>
+</div>
+</section>
+<section class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: center"><h2 style="margin: 0; font-size: 16px; font-weight: 600">Rule</h2><a href="#ref" style="font-size: 13px">Rule reference</a></div>
+<label class="lbl" for="n-rule" style="margin: 0">Rule text</label>
+<div id="n-rule" class="code" style="border: 1px solid #D1D1D1; border-bottom: 2px solid #0F6CBD; border-radius: 4px; background: #FAFAFA; padding: 10px 12px; min-height: 88px; display: grid; grid-template-columns: 28px 1fr; column-gap: 12px">
+<span class="muted" style="text-align: right">1</span><span>(<span class="p">user.department</span> <span class="o">-startsWith</span> <span class="s">"Projects South"</span>) <span class="o">-and</span></span>
+<span class="muted" style="text-align: right">2</span><span>(<span class="p">user.usageLocation</span> <span class="o">-in</span> [<span class="s">"CH"</span>,<span class="s">"IT"</span>])</span>
+</div>
+<div style="font-size: 13px; color: #0E700E">Rule is valid · 2 conditions</div>
+<div class="muted" style="font-size: 13px">Tip: an existing Entra dynamic rule can be pasted as it is.</div>
+</section>
+</div>
+<div style="flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+<section class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: center"><h2 style="margin: 0; font-size: 16px; font-weight: 600">Preview</h2><button class="btn" type="button">Run preview</button></div>
+<div style="font-size: 14px"><span style="font-size: 22px; font-weight: 600">64</span> <span class="muted">users would be members</span></div>
+<div class="muted" style="font-size: 13px">2 excluded: 1 disabled, 1 guest</div>
+</section>
+<section class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">What happens after Create</h2>
+<div class="step"><span class="num">1</span><span>The definition is saved with dry run on.</span></div>
+<div class="step"><span class="num">2</span><span>Next run (within 15 min) creates the group, adds nobody yet and records who would be added.</span></div>
+<div class="step"><span class="num">3</span><span>You check Activity, switch dry run off and save. The change limit is skipped for this first fill.</span></div>
+</section>
+</div>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1120}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

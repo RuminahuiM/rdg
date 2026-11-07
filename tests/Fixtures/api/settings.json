@@ -1,0 +1,41 @@
+{
+  "schema": "Settings",
+  "valid": true,
+  "body": {
+    "paused": false,
+    "verboseLogging": false,
+    "changeLimitPercent": 50,
+    "changeLimitMinChanges": 10,
+    "newGroupsDryRun": true,
+    "nestedMembers": true,
+    "frequencyOptions": [
+      3,
+      5,
+      15,
+      30,
+      60,
+      360,
+      1440
+    ],
+    "naming": {
+      "prefix": {
+        "enabled": true,
+        "text": "DG-"
+      },
+      "suffix": {
+        "enabled": false,
+        "text": ""
+      }
+    },
+    "marker": {
+      "enabled": false,
+      "exchangeCustomAttribute": 15
+    },
+    "auditRetentionDays": 60,
+    "etag": "\"x\"",
+    "pausedAt": null,
+    "pausedBy": null,
+    "updatedAt": "2026-10-09T10:15:00Z",
+    "updatedBy": "alex.example@contoso.org"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schema": "RuleValidationResult",
+  "valid": true,
+  "body": {
+    "valid": false,
+    "errors": [
+      {
+        "position": 21,
+        "line": 1,
+        "column": 22,
+        "length": 1,
+        "message": "expected a value after -eq"
+      }
+    ],
+    "referencedGroupIds": []
+  }
+}

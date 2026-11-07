@@ -1,0 +1,54 @@
+{
+  "schema": "PreviewResult",
+  "valid": true,
+  "body": {
+    "memberCount": 1,
+    "members": [
+      {
+        "id": "7e21a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b",
+        "upn": "casey.test@contoso.org",
+        "displayName": "Casey Test"
+      }
+    ],
+    "excluded": [
+      {
+        "user": {
+          "id": "7e21a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b",
+          "upn": "casey.test@contoso.org",
+          "displayName": "Casey Test"
+        },
+        "reason": "guest"
+      }
+    ],
+    "excludedCounts": {
+      "disabled": 0,
+      "guest": 1,
+      "excludeList": 0,
+      "noExchangeRecipient": 0
+    },
+    "diff": {
+      "addCount": 1,
+      "removeCount": 0,
+      "adds": [
+        {
+          "id": "7e21a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b",
+          "upn": "casey.test@contoso.org",
+          "displayName": "Casey Test"
+        }
+      ],
+      "removes": []
+    },
+    "changeLimit": {
+      "wouldBlock": false,
+      "percent": 2.4,
+      "limitPercent": 50
+    },
+    "emptyResult": {
+      "wouldBlock": false,
+      "currentMembers": 41,
+      "allowEmpty": false
+    },
+    "compare": null,
+    "warnings": []
+  }
+}

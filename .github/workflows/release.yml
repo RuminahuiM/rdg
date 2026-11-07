@@ -1,0 +1,84 @@
+# Builds and publishes a release for a tag vMAJOR.MINOR.PATCH (or vMAJOR.MINOR.PATCH-rc.N).
+# Runs the full CI first, then builds rdg-<version>.zip, SHA256SUMS and a build provenance
+# attestation, and creates a draft GitHub release. A maintainer completes the notes (breaking
+# changes, stage 2 rerun, new settings) and publishes it; installations deploy published
+# releases only. Reference: CI/CD design, "Release".
+name: release
+
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  release:
+    name: build and publish
+    needs: ci
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write # create the release
+      id-token: write # sign the attestation
+      attestations: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Version from the tag
+        id: version
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z]+(\.[0-9A-Za-z]+)*)?$ ]]; then
+            echo "::error::Tag $GITHUB_REF_NAME is not vMAJOR.MINOR.PATCH[-prerelease]"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if [[ "$version" == *-* ]]; then echo "prerelease=true" >> "$GITHUB_OUTPUT"; else echo "prerelease=false" >> "$GITHUB_OUTPUT"; fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: src/Web/package-lock.json
+
+      - name: Build the web app
+        working-directory: src/Web
+        run: |
+          npm ci
+          npm run build
+
+      - name: Build the bundle
+        shell: pwsh
+        env:
+          RDG_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          # renovate: datasource=nuget registryUrl=https://www.powershellgallery.com/api/v2 depName=Microsoft.Graph.Authentication
+          $graphVersion = '2.40.0'
+          $modules = New-Item -Path ./out/modules -ItemType Directory -Force
+          Save-PSResource -Name Microsoft.Graph.Authentication -Version $graphVersion -Path $modules -TrustRepository
+          ./tools/Build-Release.ps1 -Version $env:RDG_VERSION -OutputPath ./out/release `
+            -GraphModulePath ./out/modules/Microsoft.Graph.Authentication
+
+      - name: Attest build provenance
+        uses: actions/attest@v4
+        with:
+          subject-path: out/release/rdg-${{ steps.version.outputs.version }}.zip
+
+      - name: Create the draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.version }}
+          PRERELEASE: ${{ steps.version.outputs.prerelease }}
+        run: |
+          sed "s/{{VERSION}}/$VERSION/g" .github/release-notes.md > out/release/notes.md
+          flags=(--draft --verify-tag --title "RDG $VERSION" --notes-file out/release/notes.md)
+          if [ "$PRERELEASE" = "true" ]; then flags+=(--prerelease); fi
+          gh release create "$GITHUB_REF_NAME" "${flags[@]}" \
+            "out/release/rdg-$VERSION.zip" out/release/SHA256SUMS

@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Edit group</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#F5F5F5;font-family:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,sans-serif;color:#242424}
+a{color:#0F6CBD}a:hover{color:#0C3B5E}
+.nav a{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:6px;color:#242424;text-decoration:none;font-size:14px}
+.nav a:hover{background:#F0F0F0;color:#242424}
+.nav a.on{background:#EBF3FC;color:#0F548C;font-weight:600}
+.card{background:#fff;border:1px solid #E0E0E0;border-radius:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:4px;border:1px solid #D1D1D1;background:#fff;color:#242424;font:inherit;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn.primary{background:#0F6CBD;border-color:#0F6CBD;color:#fff}
+.btn.danger{color:#B10E1C}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.ok{background:#F1FAF1;color:#0E700E}
+.info{background:#EBF3FC;color:#0F548C}
+.warn{background:#FDF6F3;color:#8A3707}
+.muted{color:#616161}
+.lbl{display:block;font-size:13px;font-weight:600;margin-bottom:4px}
+input[type=text],select{font:inherit;font-size:14px;height:32px;padding:0 8px;border:1px solid #D1D1D1;border-bottom-color:#616161;border-radius:4px;background:#fff;color:#242424;box-sizing:border-box;width:100%}
+.sw{appearance:none;-webkit-appearance:none;width:40px;height:20px;border-radius:10px;border:1px solid #616161;background:#fff;position:relative;cursor:pointer;margin:0;flex:none}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:12px;height:12px;border-radius:50%;background:#616161}
+.sw:checked{background:#0F6CBD;border-color:#0F6CBD}
+.sw:checked::after{left:23px;background:#fff}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 4px 3px 10px;border-radius:4px;background:#F0F0F0;font-size:13px}
+.chip button{border:0;background:transparent;width:22px;height:22px;border-radius:3px;cursor:pointer;color:#424242;font:inherit}
+.seg{display:inline-flex;border:1px solid #D1D1D1;border-radius:4px;overflow:hidden}
+.seg button{border:0;border-right:1px solid #D1D1D1;background:#fff;height:32px;padding:0 12px;font:inherit;font-size:14px;cursor:pointer;color:#242424}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed=true]{background:#EBF3FC;color:#0F548C;font-weight:600}
+.code{font-family:"Cascadia Code",Consolas,ui-monospace,monospace;font-size:13px;line-height:22px}
+.p{color:#0F548C}.o{color:#7A2E8E}.s{color:#0E700E}
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-direction: column">
+<header style="display: flex; align-items: center; justify-content: space-between; height: 48px; padding: 0 20px; background: #0F6CBD; color: #ffffff">
+<div style="display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5"></path><path d="M16 4.5a3.5 3.5 0 0 1 0 7"></path><path d="M18.5 13.8c1.8.9 3 2.9 3 6.2"></path></svg>
+<span>Dynamic Groups</span>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; font-size: 13px">
+<span>Admin</span>
+<span style="width: 28px; height: 28px; border-radius: 50%; background: #ffffff; color: #0F548C; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 12px">DM</span>
+</div>
+</header>
+<div style="display: flex; flex-wrap: wrap; flex: 1">
+<nav class="nav" aria-label="Main" style="flex: 1 1 220px; padding: 16px 12px; background: #FAFAFA; border-right: 1px solid #E0E0E0; display: flex; flex-direction: column; gap: 2px; box-sizing: border-box">
+<a class="on" href="Main.dc.html">Groups</a>
+<a href="Activity.dc.html">Activity</a>
+<a href="Audit.dc.html">Audit</a>
+<a href="Settings.dc.html">Settings</a>
+</nav>
+<main style="flex: 999 1 560px; min-width: 0; padding: 24px 32px 40px; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box">
+<div style="font-size: 13px"><a href="Main.dc.html">Groups</a> <span class="muted">/ EOP Strict – Management</span></div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
+<h1 style="margin: 0; font-size: 24px; font-weight: 600">EOP Strict – Management</h1>
+<span class="badge info">Mail-enabled security</span>
+<span class="badge ok"><span class="dot"></span>OK</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button class="btn danger" type="button">Delete</button>
+<button class="btn" type="button">Sync now</button>
+<button class="btn primary" type="button">Save</button>
+</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+<div style="flex: 2 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+<section class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Basics</h2>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+<div><label class="lbl" for="f-name">Name</label><input id="f-name" type="text" value="EOP Strict – Management"></div>
+<div><label class="lbl" for="f-type">Group type</label><select id="f-type"><option>Mail-enabled security</option><option>Security</option><option>Microsoft 365</option><option>Distribution list</option></select></div>
+</div>
+<div>
+<span class="lbl">Target group</span>
+<div class="seg" role="group" aria-label="Target group"><button type="button" aria-pressed="false">Create new</button><button type="button" aria-pressed="true">Use existing</button><button type="button" aria-pressed="false">Adopt existing</button></div>
+<div style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center"><span class="chip">MESG-EOP-Strict · mesg-eop-strict@contoso.org <button type="button" aria-label="Remove MESG-EOP-Strict">×</button></span><span class="muted" style="font-size: 13px">Linked to this definition only</span></div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: end">
+<div><label class="lbl" for="f-freq">Frequency</label><select id="f-freq"><option>15 min</option><option>30 min</option><option>1 h</option><option>6 h</option><option>24 h</option></select></div>
+<label style="display: flex; align-items: center; gap: 10px; font-size: 14px; height: 32px"><input class="sw" type="checkbox" role="switch" checked>Enabled</label>
+<label style="display: flex; align-items: center; gap: 10px; font-size: 14px; height: 32px"><input class="sw" type="checkbox" role="switch">Dry run</label>
+</div>
+</section>
+<section class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 12px"><h2 style="margin: 0; font-size: 16px; font-weight: 600">Rule</h2><a href="#ref" style="font-size: 13px">Rule reference</a></div>
+<div>
+<label class="lbl" for="f-rule">Rule text</label>
+<div id="f-rule" class="code" style="border: 1px solid #D1D1D1; border-bottom: 2px solid #0F6CBD; border-radius: 4px; background: #FAFAFA; padding: 10px 12px; display: grid; grid-template-columns: 28px 1fr; column-gap: 12px; overflow-x: auto">
+<span class="muted" style="text-align: right">1</span><span>(<span class="p">user.extensionAttribute3</span> <span class="o">-in</span> [<span class="s">"STIFTRAT"</span>,<span class="s">"DIR1"</span>,<span class="s">"DIR2"</span>,<span class="s">"KOM"</span>,<span class="s">"GPK"</span>]) <span class="o">-or</span></span>
+<span class="muted" style="text-align: right">2</span><span>(<span class="p">user.extensionAttribute3</span> <span class="o">-startsWith</span> <span class="s">"SRV"</span>) <span class="o">-or</span></span>
+<span class="muted" style="text-align: right">3</span><span>(<span class="p">user.memberof</span> <span class="o">-any</span> (<span class="p">group.objectId</span> <span class="o">-in</span> [<span class="s">'7c1e…a4f2'</span>]))  <span class="muted" style="font-family: 'Segoe UI', system-ui, sans-serif; font-size: 12px">← Geschäftsleitung (managed)</span></span>
+</div>
+<div style="display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 13px; color: #0E700E"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>Rule is valid · 3 conditions · references 1 managed group</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+<div><span class="lbl">Always include</span><div style="display: flex; flex-wrap: wrap; gap: 6px; border: 1px solid #D1D1D1; border-radius: 4px; padding: 5px 6px; min-height: 32px; box-sizing: border-box"><span class="chip">Lea Keller <button type="button" aria-label="Remove Lea Keller">×</button></span></div></div>
+<div><span class="lbl">Always exclude</span><div style="display: flex; flex-wrap: wrap; gap: 6px; border: 1px solid #D1D1D1; border-radius: 4px; padding: 5px 6px; min-height: 32px; box-sizing: border-box"><span class="chip">svc-backup <button type="button" aria-label="Remove svc-backup">×</button></span></div></div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 24px">
+<label style="display: flex; align-items: center; gap: 10px; font-size: 14px"><input class="sw" type="checkbox" role="switch">Include disabled accounts</label>
+<label style="display: flex; align-items: center; gap: 10px; font-size: 14px"><input class="sw" type="checkbox" role="switch">Include guests</label>
+</div>
+</section>
+<section class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 16px">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Safety</h2>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: end">
+<div><label class="lbl" for="f-limit">Change limit</label><select id="f-limit"><option>Organisation default (50 %)</option><option>30 %</option><option>75 %</option></select></div>
+<label style="display: flex; align-items: center; gap: 10px; font-size: 14px; height: 32px"><input class="sw" type="checkbox" role="switch">Allow empty result</label>
+</div>
+</section>
+</div>
+<div style="flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+<section class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Status</h2>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; font-size: 14px">
+<div><div class="muted" style="font-size: 13px">Last result</div><div style="margin-top: 2px"><span class="badge ok"><span class="dot"></span>OK</span></div></div>
+<div><div class="muted" style="font-size: 13px">Members</div><div style="margin-top: 2px; font-weight: 600">42</div></div>
+<div><div class="muted" style="font-size: 13px">Last sync</div><div style="margin-top: 2px">Today 10:15</div></div>
+<div><div class="muted" style="font-size: 13px">Last run</div><div style="margin-top: 2px">+1 / −0</div></div>
+</div>
+<a href="Activity.dc.html" style="font-size: 14px">View runs of this group</a>
+</section>
+<section class="card" style="padding: 20px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; justify-content: space-between; align-items: center"><h2 style="margin: 0; font-size: 16px; font-weight: 600">Preview</h2><button class="btn" type="button">Run preview</button></div>
+<div class="muted" style="font-size: 13px">Based on live data, 10:21</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; text-align: center">
+<div style="background: #FAFAFA; border-radius: 6px; padding: 10px 4px"><div style="font-size: 22px; font-weight: 600">43</div><div class="muted" style="font-size: 12px">members</div></div>
+<div style="background: #F1FAF1; border-radius: 6px; padding: 10px 4px"><div style="font-size: 22px; font-weight: 600; color: #0E700E">+1</div><div class="muted" style="font-size: 12px">to add</div></div>
+<div style="background: #FAFAFA; border-radius: 6px; padding: 10px 4px"><div style="font-size: 22px; font-weight: 600">0</div><div class="muted" style="font-size: 12px">to remove</div></div>
+</div>
+<div style="font-size: 14px; display: flex; flex-direction: column; gap: 8px">
+<div style="font-weight: 600">Would be added</div>
+<div style="display: flex; justify-content: space-between"><span>Marco Rossi</span><span class="muted">extensionAttribute3 = KOM</span></div>
+<div style="font-weight: 600; margin-top: 6px">Excluded by filters (3)</div>
+<div style="display: flex; justify-content: space-between"><span>Anna Weber</span><span class="badge warn">disabled</span></div>
+<div style="display: flex; justify-content: space-between"><span>Peter Graf</span><span class="badge warn">disabled</span></div>
+<div style="display: flex; justify-content: space-between"><span>j.doe_partner.org#EXT#</span><span class="badge warn">guest</span></div>
+<div style="font-weight: 600; margin-top: 6px">Exchange check</div>
+<div class="muted">All 43 users have a mail address.</div>
+</div>
+<div style="border-top: 1px solid #F0F0F0; padding-top: 12px; font-size: 14px; display: flex; align-items: center; gap: 8px"><span class="badge ok">Within change limit</span><span class="muted">1 change, 2 % of 42</span></div>
+</section>
+</div>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1280}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Rule editor states</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;font-family:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,sans-serif;color:#242424}
+.card{background:#fff;border:1px solid #E0E0E0;border-radius:8px}
+.muted{color:#616161}
+.code{font-family:"Cascadia Code",Consolas,ui-monospace,monospace;font-size:13px;line-height:22px}
+.p{color:#0F548C}.o{color:#7A2E8E}.s{color:#0E700E}
+.bad{text-decoration:underline wavy #C50F1F;text-underline-offset:3px}
+.item{display:flex;justify-content:space-between;gap:16px;padding:6px 10px;font-size:13px}
+</style>
+</helmet>
+<div style="width: 1440px; height: 760px; box-sizing: border-box; background: #F5F5F5; padding: 48px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; align-items: start">
+<section class="card" style="padding: 24px; display: flex; flex-direction: column; gap: 14px">
+<div><h2 style="margin: 0; font-size: 16px; font-weight: 600">Invalid rule</h2><p class="muted" style="margin: 4px 0 0; font-size: 13px">Checked 400 ms after typing stops; Save is disabled until it is valid.</p></div>
+<div class="code" style="border: 1px solid #D1D1D1; border-bottom: 2px solid #C50F1F; border-radius: 4px; background: #FAFAFA; padding: 10px 12px; display: grid; grid-template-columns: 28px 1fr; column-gap: 12px">
+<span class="muted" style="text-align: right">1</span><span>(<span class="p">user.department</span> <span class="o">-eq</span><span class="bad">&#160;)</span> <span class="o">-and</span></span>
+<span class="muted" style="text-align: right">2</span><span>(<span class="p bad">user.extensionAtribute3</span> <span class="o">-in</span> [<span class="s">"KOM"</span>,<span class="s">"DIR1"</span>])</span>
+</div>
+<div role="alert" style="display: flex; flex-direction: column; gap: 8px; font-size: 14px">
+<div style="display: flex; gap: 8px; color: #B10E1C"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex: none; margin-top: 2px"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5v5.5M12 16.5v.01"></path></svg><span><strong>Line 1, position 22:</strong> expected a value after -eq</span></div>
+<div style="display: flex; gap: 8px; color: #B10E1C"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex: none; margin-top: 2px"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5v5.5M12 16.5v.01"></path></svg><span><strong>Line 2, position 2:</strong> unknown property user.extensionAtribute3. Did you mean <a href="#fix" style="color: #0F6CBD">extensionAttribute3</a>?</span></div>
+</div>
+</section>
+<section class="card" style="padding: 24px; display: flex; flex-direction: column; gap: 14px">
+<div><h2 style="margin: 0; font-size: 16px; font-weight: 600">Autocomplete</h2><p class="muted" style="margin: 4px 0 0; font-size: 13px">After “user.” properties appear with their type; after a property, only the operators that fit it.</p></div>
+<div style="position: relative">
+<div class="code" style="border: 1px solid #D1D1D1; border-bottom: 2px solid #0F6CBD; border-radius: 4px; background: #FAFAFA; padding: 10px 12px; display: grid; grid-template-columns: 28px 1fr; column-gap: 12px">
+<span class="muted" style="text-align: right">1</span><span>(<span class="p">user.ex</span><span style="border-left: 2px solid #242424"></span></span>
+</div>
+<div role="listbox" aria-label="Suggestions" class="code" style="position: absolute; left: 70px; top: 40px; width: 380px; background: #ffffff; border: 1px solid #E0E0E0; border-radius: 6px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12); padding: 4px 0">
+<div class="item" role="option" aria-selected="true" style="background: #EBF3FC"><span>extensionAttribute1</span><span class="muted">string</span></div>
+<div class="item" role="option"><span>extensionAttribute2</span><span class="muted">string</span></div>
+<div class="item" role="option"><span>extensionAttribute3</span><span class="muted">string</span></div>
+<div class="item" role="option"><span>extension_c272…_OfficeNumber</span><span class="muted">string · directory ext.</span></div>
+<div class="item" role="option"><span>employeeHireDate</span><span class="muted">date</span></div>
+<div class="item muted" role="option"><span>… 11 more</span><span></span></div>
+</div>
+</div>
+<div style="height: 200px"></div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":760}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

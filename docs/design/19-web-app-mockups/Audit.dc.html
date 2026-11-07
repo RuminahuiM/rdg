@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Audit</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#F5F5F5;font-family:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,sans-serif;color:#242424}
+a{color:#0F6CBD}a:hover{color:#0C3B5E}
+.nav a{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:6px;color:#242424;text-decoration:none;font-size:14px}
+.nav a:hover{background:#F0F0F0;color:#242424}
+.nav a.on{background:#EBF3FC;color:#0F548C;font-weight:600}
+.card{background:#fff;border:1px solid #E0E0E0;border-radius:8px}
+.muted{color:#616161}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-weight:600;color:#424242;padding:10px 12px;border-bottom:1px solid #E0E0E0;white-space:nowrap;font-size:13px}
+td{padding:11px 12px;border-bottom:1px solid #F0F0F0;vertical-align:top}
+tr:last-child td{border-bottom:0}
+.old{background:#FDF3F4;color:#6E0811;padding:1px 4px;border-radius:3px;text-decoration:line-through}
+.new{background:#F1FAF1;color:#0A5A0A;padding:1px 4px;border-radius:3px}
+.mono{font-family:"Cascadia Code",Consolas,ui-monospace,monospace;font-size:12.5px}
+input,select{font:inherit;font-size:14px;height:32px;padding:0 8px;border:1px solid #D1D1D1;border-bottom-color:#616161;border-radius:4px;background:#fff;color:#242424;box-sizing:border-box}
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-direction: column">
+<header style="display: flex; align-items: center; justify-content: space-between; height: 48px; padding: 0 20px; background: #0F6CBD; color: #ffffff">
+<div style="display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5"></path><path d="M16 4.5a3.5 3.5 0 0 1 0 7"></path><path d="M18.5 13.8c1.8.9 3 2.9 3 6.2"></path></svg>
+<span>Dynamic Groups</span>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; font-size: 13px">
+<span>Reader</span>
+<span style="width: 28px; height: 28px; border-radius: 50%; background: #ffffff; color: #0F548C; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 12px">SD</span>
+</div>
+</header>
+<div style="display: flex; flex-wrap: wrap; flex: 1">
+<nav class="nav" aria-label="Main" style="flex: 1 1 220px; padding: 16px 12px; background: #FAFAFA; border-right: 1px solid #E0E0E0; display: flex; flex-direction: column; gap: 2px; box-sizing: border-box">
+<a href="Main.dc.html">Groups</a>
+<a href="Activity.dc.html">Activity</a>
+<a class="on" href="Audit.dc.html">Audit</a>
+<a href="Settings.dc.html">Settings</a>
+</nav>
+<main style="flex: 999 1 560px; min-width: 0; padding: 24px 32px 40px; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box">
+<div>
+<h1 style="margin: 0; font-size: 24px; font-weight: 600">Audit</h1>
+<p class="muted" style="margin: 4px 0 0; font-size: 14px">Every change to groups and settings: who, when, and what changed. Signed in as reader: view only.</p>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 4px"><label for="u-group" style="font-size: 13px; font-weight: 600">Group</label><select id="u-group"><option>All groups and settings</option><option>Intune – Field Laptops</option></select></div>
+<div style="display: flex; flex-direction: column; gap: 4px"><label for="u-who" style="font-size: 13px; font-weight: 600">Changed by</label><input id="u-who" type="search" placeholder="Name or UPN"></div>
+<div style="display: flex; flex-direction: column; gap: 4px"><label for="u-range" style="font-size: 13px; font-weight: 600">Period</label><select id="u-range"><option>Last 7 days</option><option>Last 30 days</option><option>All</option></select></div>
+</div>
+<div class="card" style="overflow-x: auto">
+<table>
+<thead><tr><th>When</th><th>Who</th><th>Action</th><th>Group</th><th>Change</th></tr></thead>
+<tbody>
+<tr><td style="white-space: nowrap">Today 10:15</td><td style="white-space: nowrap">Dodoe M.</td><td style="white-space: nowrap">Paused syncing</td><td class="muted">Settings</td><td>Pause all syncing: <span class="old">off</span> → <span class="new">on</span></td></tr>
+<tr><td style="white-space: nowrap">Today 09:52</td><td style="white-space: nowrap">Dodoe M.</td><td style="white-space: nowrap">Sync now</td><td style="white-space: nowrap">EOP Strict – Management</td><td class="muted">Job started for Sync-ExchangeGroups</td></tr>
+<tr><td style="white-space: nowrap">Yesterday 16:40</td><td style="white-space: nowrap">Lea Keller</td><td style="white-space: nowrap">Changed rule</td><td style="white-space: nowrap">Intune – Field Laptops</td><td class="mono"><span class="old">user.extensionAttribute5 -eq "FIELD"</span><br><span class="new">user.extensionAttribute5 -startsWith "FIELD"</span></td></tr>
+<tr><td style="white-space: nowrap">Yesterday 14:05</td><td style="white-space: nowrap">Dodoe M.</td><td style="white-space: nowrap">Adopted group</td><td style="white-space: nowrap">Board Members</td><td>Target: <span class="new">MESG-Board (existing)</span>; dry run forced until approved</td></tr>
+<tr><td style="white-space: nowrap">7 Oct 11:20</td><td style="white-space: nowrap">Dodoe M.</td><td style="white-space: nowrap">Approved change</td><td style="white-space: nowrap">All Staff Zürich</td><td>Change limit approved once for 41 changes (13 %)</td></tr>
+<tr><td style="white-space: nowrap">6 Oct 09:03</td><td style="white-space: nowrap">Dodoe M.</td><td style="white-space: nowrap">Changed setting</td><td class="muted">Settings</td><td>Name prefix: <span class="old">none</span> → <span class="new">DG-</span></td></tr>
+<tr><td style="white-space: nowrap">6 Oct 08:47</td><td style="white-space: nowrap">Dodoe M.</td><td style="white-space: nowrap">Created group</td><td style="white-space: nowrap">EOP Strict – Management</td><td>Type Mail-enabled security, frequency 15 min, dry run on</td></tr>
+</tbody>
+</table>
+</div>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":800}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

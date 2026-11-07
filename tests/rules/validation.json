@@ -1,0 +1,231 @@
+{
+  "title": "Rule validation",
+  "description": "Checks that need the property types: unknown properties, operator and value types, regexes and the shapes -any/-all allow. The first error by position is compared.",
+  "cases": [
+    {
+      "id": "unknown-property",
+      "rule": "user.extensionAtribute3 -eq \"X\"",
+      "valid": false,
+      "error": {
+        "position": 0,
+        "message": "unknown property user.extensionAtribute3; did you mean extensionAttribute3?"
+      }
+    },
+    {
+      "id": "unknown-property-no-suggestion",
+      "rule": "user.favouriteColour -eq \"blue\"",
+      "valid": false,
+      "error": {
+        "position": 0,
+        "message": "unknown property user.favouriteColour"
+      }
+    },
+    {
+      "id": "unknown-in-collection",
+      "rule": "user.proxyAdresses -any (_ -eq \"x\")",
+      "valid": false,
+      "error": {
+        "position": 0,
+        "message": "did you mean proxyAddresses?"
+      }
+    },
+    {
+      "id": "ge-on-text",
+      "rule": "user.department -ge \"A\"",
+      "valid": false,
+      "error": {
+        "position": 0,
+        "message": "-ge only works with dates; user.department is text"
+      }
+    },
+    {
+      "id": "bool-in-text",
+      "rule": "user.department -eq true",
+      "valid": false,
+      "error": {
+        "position": 20,
+        "message": "user.department is text; put the value in quotes"
+      }
+    },
+    {
+      "id": "date-in-text",
+      "rule": "user.city -eq 2020-01-01",
+      "valid": false,
+      "error": {
+        "position": 14,
+        "message": "user.city is text"
+      }
+    },
+    {
+      "id": "bool-startsWith",
+      "rule": "user.accountEnabled -startsWith \"t\"",
+      "valid": false,
+      "error": {
+        "position": 0,
+        "message": "user.accountEnabled is true or false; use -eq or -ne"
+      }
+    },
+    {
+      "id": "bool-text-value",
+      "rule": "user.accountEnabled -eq \"yes\"",
+      "valid": false,
+      "error": {
+        "position": 24,
+        "message": "compare it with true or false"
+      }
+    },
+    {
+      "id": "date-contains",
+      "rule": "user.employeeHireDate -contains \"2020\"",
+      "valid": false,
+      "error": {
+        "position": 0,
+        "message": "user.employeeHireDate is a date; use -eq, -ne, -le or -ge"
+      }
+    },
+    {
+      "id": "date-bad-text",
+      "rule": "user.employeeHireDate -ge \"soon\"",
+      "valid": false,
+      "error": {
+        "position": 26,
+        "message": "user.employeeHireDate is a date"
+      }
+    },
+    {
+      "id": "bad-regex",
+      "rule": "user.displayName -match \"([a-z\"",
+      "valid": false,
+      "error": {
+        "position": 24,
+        "message": "invalid regular expression"
+      }
+    },
+    {
+      "id": "collection-direct",
+      "rule": "user.proxyAddresses -eq \"smtp:a@contoso.org\"",
+      "valid": false,
+      "error": {
+        "position": 0,
+        "message": "user.proxyAddresses has several values; use -any or -all"
+      }
+    },
+    {
+      "id": "collection-contains",
+      "rule": "user.otherMails -contains \"a@b.c\"",
+      "valid": false,
+      "error": {
+        "position": 0,
+        "message": "has several values"
+      }
+    },
+    {
+      "id": "any-on-single",
+      "rule": "user.department -any (_ -eq \"x\")",
+      "valid": false,
+      "error": {
+        "position": 0,
+        "message": "-any only works on properties with several values"
+      }
+    },
+    {
+      "id": "wrong-item-name",
+      "rule": "user.proxyAddresses -any (assignedPlan.service -eq \"x\")",
+      "valid": false,
+      "error": {
+        "position": 26,
+        "message": "refer to the items of user.proxyAddresses as _"
+      }
+    },
+    {
+      "id": "plan-unknown-field",
+      "rule": "user.assignedPlans -any (assignedPlan.name -eq \"x\")",
+      "valid": false,
+      "error": {
+        "position": 25,
+        "message": "assignedPlan has no field name"
+      }
+    },
+    {
+      "id": "plan-underscore",
+      "rule": "user.assignedPlans -any (_ -eq \"x\")",
+      "valid": false,
+      "error": {
+        "position": 25,
+        "message": "refer to the items of user.assignedPlans as assignedPlan"
+      }
+    },
+    {
+      "id": "memberof-all",
+      "rule": "user.memberOf -all (group.objectId -in ['9a9a9a9a-0000-4000-8000-000000000001'])",
+      "valid": false,
+      "error": {
+        "position": 0,
+        "message": "memberOf only supports -any"
+      }
+    },
+    {
+      "id": "memberof-not-guid",
+      "rule": "user.memberOf -any (group.objectId -in ['Sales'])",
+      "valid": false,
+      "error": {
+        "position": 40,
+        "message": "group IDs must be object IDs"
+      }
+    },
+    {
+      "id": "memberof-other-field",
+      "rule": "user.memberOf -any (group.displayName -eq \"Sales\")",
+      "valid": false,
+      "error": {
+        "position": 20,
+        "message": "only group.objectId is supported"
+      }
+    },
+    {
+      "id": "memberof-startswith",
+      "rule": "user.memberOf -any (group.objectId -startsWith '9a9a9a9a')",
+      "valid": false,
+      "error": {
+        "position": 20,
+        "message": "use group.objectId -in"
+      }
+    },
+    {
+      "id": "memberof-two-conditions",
+      "rule": "user.memberOf -any (group.objectId -in ['9a9a9a9a-0000-4000-8000-000000000001'] -or group.objectId -in ['9a9a9a9a-0000-4000-8000-000000000001'])",
+      "valid": false,
+      "error": {
+        "position": 20,
+        "message": "use a single condition"
+      }
+    },
+    {
+      "id": "item-ge",
+      "rule": "user.proxyAddresses -any (_ -ge \"a\")",
+      "valid": false,
+      "error": {
+        "position": 26,
+        "message": "-ge only works with dates; the item is text"
+      }
+    },
+    {
+      "id": "memberof-eq-ok",
+      "rule": "user.memberOf -any (group.objectId -eq '9a9a9a9a-0000-4000-8000-000000000001')",
+      "valid": true,
+      "tree": "(any user.memberOf (eq group.objectId \"9a9a9a9a-0000-4000-8000-000000000001\"))"
+    },
+    {
+      "id": "extension-property-ok",
+      "rule": "user.extension_C272A57B722D4EB29BFE327874AE79CB_OfficeNumber -eq \"1\"",
+      "valid": true,
+      "tree": "(eq user.extension_C272A57B722D4EB29BFE327874AE79CB_OfficeNumber \"1\")"
+    },
+    {
+      "id": "property-case-ok",
+      "rule": "user.EXTENSIONATTRIBUTE3 -eq \"x\"",
+      "valid": true,
+      "tree": "(eq user.EXTENSIONATTRIBUTE3 \"x\")"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>No access and error page</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;font-family:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,sans-serif;color:#242424}
+a{color:#0F6CBD}a:hover{color:#0C3B5E}
+.card{background:#fff;border:1px solid #E0E0E0;border-radius:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 14px;border-radius:4px;border:1px solid #D1D1D1;background:#fff;color:#242424;font:inherit;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn.primary{background:#0F6CBD;border-color:#0F6CBD;color:#fff}
+.muted{color:#616161}
+</style>
+</helmet>
+<div style="width: 1440px; height: 760px; box-sizing: border-box; background: #F5F5F5; display: flex; flex-direction: column">
+<div style="height: 48px; background: #0F6CBD; color: #ffffff; display: flex; align-items: center; gap: 10px; padding: 0 20px; font-weight: 600; font-size: 15px">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5"></path><path d="M16 4.5a3.5 3.5 0 0 1 0 7"></path><path d="M18.5 13.8c1.8.9 3 2.9 3 6.2"></path></svg>
+<span>Dynamic Groups</span>
+</div>
+<div style="flex: 1; padding: 64px 48px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; align-items: start">
+<section class="card" style="padding: 32px; display: flex; flex-direction: column; gap: 14px">
+<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#616161" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="9.5" rx="2"></rect><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"></path></svg>
+<h1 style="margin: 0; font-size: 22px; font-weight: 600">You don't have access to Dynamic Groups</h1>
+<p style="margin: 0; font-size: 14px">You are signed in as <strong>marco.rossi@contoso.org</strong>, but this account has no role in the app.</p>
+<p class="muted" style="margin: 0; font-size: 14px">Ask your IT admin to add you to the admins or readers group for this app. Changes can take a few minutes after sign-out.</p>
+<div style="display: flex; gap: 8px; margin-top: 4px"><a class="btn" href="#signout">Sign out</a><a class="btn" href="#other">Use another account</a></div>
+</section>
+<section class="card" style="padding: 32px; display: flex; flex-direction: column; gap: 14px">
+<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#B10E1C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5v5.5M12 16.5v.01"></path></svg>
+<h1 style="margin: 0; font-size: 22px; font-weight: 600">Something went wrong</h1>
+<p style="margin: 0; font-size: 14px">The request could not be completed. Nothing was changed.</p>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; background: #FAFAFA; border-radius: 6px; padding: 10px 12px; font-size: 14px">
+<span class="muted">Correlation ID</span>
+<code style="font-family: 'Cascadia Code', Consolas, ui-monospace, monospace; font-size: 13px">4f2a9c1e-7b3d-4e11-9a0c-58d2e6b1f7a3</code>
+<button class="btn" type="button" style="height: 28px; font-size: 13px">Copy</button>
+</div>
+<p class="muted" style="margin: 0; font-size: 14px">If it happens again, send this ID to whoever runs the tool. It matches the entry in the API log.</p>
+<div style="display: flex; gap: 8px; margin-top: 4px"><button class="btn primary" type="button">Try again</button><a class="btn" href="Main.dc.html">Back to Groups</a></div>
+</section>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":760}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

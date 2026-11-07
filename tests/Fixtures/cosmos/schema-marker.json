@@ -1,0 +1,1 @@
+{ "id": "schema", "pk": "system", "type": "schema", "schemaVersion": 1, "upgradedTo": 1, "upgradedAt": "2026-10-09T08:00:00Z", "upgradedByVersion": "0.1.0" }

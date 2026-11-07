@@ -1,0 +1,6 @@
+{
+  "id": "run-6d2f3e4a-5b6c-4d7e-8f9a-0b1c2d3e4f5a-system", "pk": "system", "type": "run", "schemaVersion": 1,
+  "jobId": "6d2f3e4a-5b6c-4d7e-8f9a-0b1c2d3e4f5a", "runbook": "Entra", "mode": "Scheduled",
+  "startedAt": "2026-10-09T10:30:00Z", "durationMs": 1200, "engineVersion": "0.1.0",
+  "result": "Paused", "reason": "Paused by alex.example@contoso.org at 2026-10-09T10:15:00Z"
+}

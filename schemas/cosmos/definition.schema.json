@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.rdg.invalid/cosmos/definition.schema.json",
+  "title": "Definition (container config)",
+  "description": "One per managed group. Written only by the API; read by the engine.",
+  "type": "object",
+  "$ref": "common.schema.json#/$defs/cosmosSystemProperties",
+  "required": [
+    "id", "pk", "type", "schemaVersion", "name", "groupType", "target", "rule",
+    "includeUserIds", "excludeUserIds", "includeDisabled", "includeGuests",
+    "frequencyMinutes", "enabled", "dryRun", "changeLimitPercent", "allowEmpty",
+    "compareGroupId", "syncRequest", "approval",
+    "createdAt", "createdBy", "updatedAt", "updatedBy"
+  ],
+  "unevaluatedProperties": false,
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/definitionId" },
+    "pk": { "$ref": "common.schema.json#/$defs/definitionId", "description": "Same as id." },
+    "type": { "const": "definition" },
+    "schemaVersion": { "const": 1 },
+    "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "groupType": { "$ref": "common.schema.json#/$defs/groupType" },
+    "target": {
+      "type": "object",
+      "required": ["mode"],
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "description": "create: the engine creates the group (its ID is then only in the status document). existing: a group RDG already owns. adopt: take over a group that exists outside RDG.",
+          "enum": ["create", "existing", "adopt"]
+        },
+        "groupId": { "$ref": "common.schema.json#/$defs/objectId" },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "mailNickname": { "type": "string", "pattern": "^[A-Za-z0-9._-]{1,64}$" },
+        "adopted": { "type": "boolean", "description": "true once an adoption has been approved." },
+        "renameOnAdopt": { "type": "boolean" },
+        "convertFromDynamic": {
+          "type": "boolean",
+          "description": "The adopted group is a Microsoft dynamic group; on approval the engine switches it to assigned membership."
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "mode": { "const": "create" } } },
+          "then": { "required": ["displayName"], "properties": { "groupId": false } },
+          "else": { "required": ["groupId"] }
+        }
+      ]
+    },
+    "rule": { "type": "string", "minLength": 1, "maxLength": 10000 },
+    "includeUserIds": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/objectId" }, "uniqueItems": true, "maxItems": 500 },
+    "excludeUserIds": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/objectId" }, "uniqueItems": true, "maxItems": 500 },
+    "includeDisabled": { "type": "boolean" },
+    "includeGuests": { "type": "boolean" },
+    "frequencyMinutes": { "type": "integer", "minimum": 3, "maximum": 1440 },
+    "enabled": { "type": "boolean" },
+    "dryRun": { "type": "boolean" },
+    "changeLimitPercent": {
+      "description": "null = use the organisation default.",
+      "type": ["integer", "null"], "minimum": 1, "maximum": 100
+    },
+    "allowEmpty": { "type": "boolean", "description": "Allow a sync that would leave the group empty." },
+    "compareGroupId": {
+      "description": "Optional group to compare the result with, typically the Microsoft dynamic group being replaced.",
+      "oneOf": [{ "$ref": "common.schema.json#/$defs/objectId" }, { "type": "null" }]
+    },
+    "syncRequest": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "required": ["at", "by"],
+          "additionalProperties": false,
+          "properties": {
+            "at": { "$ref": "common.schema.json#/$defs/timestamp" },
+            "by": { "$ref": "common.schema.json#/$defs/upn" }
+          }
+        }
+      ]
+    },
+    "approval": {
+      "description": "Set by IT through the approve endpoint. Covers exactly the diff with this hash.",
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "required": ["kind", "diffHash", "adds", "removes", "by", "at"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "enum": ["changeLimit", "adopt"] },
+            "diffHash": { "$ref": "common.schema.json#/$defs/sha256" },
+            "adds": { "type": "integer", "minimum": 0 },
+            "removes": { "type": "integer", "minimum": 0 },
+            "by": { "$ref": "common.schema.json#/$defs/upn" },
+            "at": { "$ref": "common.schema.json#/$defs/timestamp" }
+          }
+        }
+      ]
+    },
+    "createdAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "createdBy": { "$ref": "common.schema.json#/$defs/upn" },
+    "updatedAt": { "$ref": "common.schema.json#/$defs/timestamp" },
+    "updatedBy": { "$ref": "common.schema.json#/$defs/upn" }
+  }
+}

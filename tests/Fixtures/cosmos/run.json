@@ -1,0 +1,16 @@
+{
+  "id": "run-5c1e2d3f-4a5b-4c6d-8e7f-9a0b1c2d3e4f-def-01JA7K3M9QXR4T6V8W0Y2Z4B6D", "pk": "def-01JA7K3M9QXR4T6V8W0Y2Z4B6D", "type": "run", "schemaVersion": 1,
+  "jobId": "5c1e2d3f-4a5b-4c6d-8e7f-9a0b1c2d3e4f", "runbook": "Exchange", "mode": "Scheduled",
+  "startedAt": "2026-10-09T10:15:05Z", "durationMs": 38210, "engineVersion": "0.1.0",
+  "definitionName": "EOP Strict – Management", "groupId": "0b7d2c1e-5a4f-4e3b-9c8d-7f6e5d4c3b2a",
+  "result": "OK", "dryRun": false, "dryRunReason": null,
+  "addedCount": 1, "removedCount": 0, "skippedCount": 0,
+  "added": [ { "id": "7e21a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b", "upn": "casey.test@contoso.org", "displayName": "Casey Test" } ],
+  "removed": [],
+  "excluded": { "disabled": 2, "guests": 1 },
+  "manualChangesReverted": { "added": 0, "removed": 0 },
+  "approval": null,
+  "warnings": [], "error": null,
+  "compare": { "groupId": "4c3b2a1f-0e9d-4c8b-a7f6-e5d4c3b2a1f0", "onlyInRdgCount": 0, "onlyInCompareCount": 1, "onlyInRdg": [],
+               "onlyInCompare": [ { "id": "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d", "upn": "jordan.demo@contoso.org" } ] }
+}

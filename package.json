@@ -1,0 +1,19 @@
+{
+  "name": "rdg-repo-tools",
+  "private": true,
+  "description": "Repo-level checks. The web app has its own package.json in src/Web.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "contracts:check": "node tools/check-contracts.mjs && redocly lint src/Api/openapi.yaml --config redocly.yaml",
+    "api:export": "node tools/export-openapi.mjs"
+  },
+  "devDependencies": {
+    "@redocly/cli": "1.34.5",
+    "ajv": "8.17.1",
+    "ajv-formats": "3.0.1",
+    "yaml": "2.8.1"
+  }
+}

@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Settings</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#F5F5F5;font-family:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,sans-serif;color:#242424}
+a{color:#0F6CBD}a:hover{color:#0C3B5E}
+.nav a{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:6px;color:#242424;text-decoration:none;font-size:14px}
+.nav a:hover{background:#F0F0F0;color:#242424}
+.nav a.on{background:#EBF3FC;color:#0F548C;font-weight:600}
+.card{background:#fff;border:1px solid #E0E0E0;border-radius:8px}
+.btn{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:4px;border:1px solid #D1D1D1;background:#fff;color:#242424;font:inherit;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn.primary{background:#0F6CBD;border-color:#0F6CBD;color:#fff}
+.muted{color:#616161}
+.lbl{display:block;font-size:13px;font-weight:600;margin-bottom:4px}
+input[type=text],select{font:inherit;font-size:14px;height:32px;padding:0 8px;border:1px solid #D1D1D1;border-bottom-color:#616161;border-radius:4px;background:#fff;color:#242424;box-sizing:border-box;width:100%}
+.sw{appearance:none;-webkit-appearance:none;width:40px;height:20px;border-radius:10px;border:1px solid #616161;background:#fff;position:relative;cursor:pointer;margin:0;flex:none}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:12px;height:12px;border-radius:50%;background:#616161}
+.sw:checked{background:#0F6CBD;border-color:#0F6CBD}
+.sw:checked::after{left:23px;background:#fff}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 4px 3px 10px;border-radius:4px;background:#F0F0F0;font-size:13px}
+.chip button{border:0;background:transparent;width:22px;height:22px;border-radius:3px;cursor:pointer;color:#424242;font:inherit}
+.row{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:16px;padding:14px 0;border-top:1px solid #F0F0F0}
+.row:first-of-type{border-top:0}
+.sub{font-size:13px;color:#616161;margin-top:2px}
+</style>
+</helmet>
+<div style="min-height: 100vh; display: flex; flex-direction: column">
+<header style="display: flex; align-items: center; justify-content: space-between; height: 48px; padding: 0 20px; background: #0F6CBD; color: #ffffff">
+<div style="display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5"></path><path d="M16 4.5a3.5 3.5 0 0 1 0 7"></path><path d="M18.5 13.8c1.8.9 3 2.9 3 6.2"></path></svg>
+<span>Dynamic Groups</span>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; font-size: 13px">
+<span>Admin</span>
+<span style="width: 28px; height: 28px; border-radius: 50%; background: #ffffff; color: #0F548C; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 12px">DM</span>
+</div>
+</header>
+<div role="status" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 20px; background: #FFF4CE; color: #5C3B00; font-size: 14px; border-bottom: 1px solid #F2D58E">
+<span><strong>Syncing is paused</strong> since 10:15 by Dodoe M. No group changes until it is resumed.</span>
+<button class="btn" type="button">Resume syncing</button>
+</div>
+<div style="display: flex; flex-wrap: wrap; flex: 1">
+<nav class="nav" aria-label="Main" style="flex: 1 1 220px; padding: 16px 12px; background: #FAFAFA; border-right: 1px solid #E0E0E0; display: flex; flex-direction: column; gap: 2px; box-sizing: border-box">
+<a href="Main.dc.html">Groups</a>
+<a href="Activity.dc.html">Activity</a>
+<a href="Audit.dc.html">Audit</a>
+<a class="on" href="Settings.dc.html">Settings</a>
+</nav>
+<main style="flex: 999 1 560px; min-width: 0; padding: 24px 32px 40px; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box; max-width: 980px">
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px">
+<div>
+<h1 style="margin: 0; font-size: 24px; font-weight: 600">Settings</h1>
+<p class="muted" style="margin: 4px 0 0; font-size: 14px">Organisation-wide. Changes apply on the next run.</p>
+</div>
+<button class="btn primary" type="button">Save settings</button>
+</div>
+<section class="card" style="padding: 8px 20px">
+<h2 style="margin: 12px 0 4px; font-size: 16px; font-weight: 600">Sync</h2>
+<div class="row"><div><div style="font-weight: 600; font-size: 14px">Pause all syncing</div><div class="sub">Every run exits right after start. Use it as the emergency stop.</div></div><input class="sw" type="checkbox" role="switch" aria-label="Pause all syncing" checked></div>
+<div class="row"><div style="flex: 1 1 360px"><div style="font-weight: 600; font-size: 14px">Frequency options</div><div class="sub">Shown in the group form. Values below the tick (15 min) run at the tick.</div><div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px"><span class="chip">3 min <button type="button" aria-label="Remove 3 min">×</button></span><span class="chip">5 min <button type="button" aria-label="Remove 5 min">×</button></span><span class="chip">15 min <button type="button" aria-label="Remove 15 min">×</button></span><span class="chip">30 min <button type="button" aria-label="Remove 30 min">×</button></span><span class="chip">1 h <button type="button" aria-label="Remove 1 h">×</button></span><span class="chip">6 h <button type="button" aria-label="Remove 6 h">×</button></span><span class="chip">24 h <button type="button" aria-label="Remove 24 h">×</button></span><button class="btn" type="button" style="height: 28px; font-size: 13px">Add option</button></div></div></div>
+<div class="row"><div><div style="font-weight: 600; font-size: 14px">Verbose logging</div><div class="sub">More detail in the Automation job output, for troubleshooting.</div></div><input class="sw" type="checkbox" role="switch" aria-label="Verbose logging"></div>
+</section>
+<section class="card" style="padding: 8px 20px">
+<h2 style="margin: 12px 0 4px; font-size: 16px; font-weight: 600">Safety defaults</h2>
+<div class="row"><div style="flex: 1 1 300px"><div style="font-weight: 600; font-size: 14px">Change limit</div><div class="sub">Block a run that adds plus removes more than this share of members. Groups can override it.</div></div><div style="width: 160px"><label class="lbl" for="s-limit" style="position: absolute; left: -9999px">Change limit</label><select id="s-limit"><option>50 %</option><option>40 %</option><option>30 %</option><option>20 %</option></select></div></div>
+<div class="row"><div style="flex: 1 1 300px"><div style="font-weight: 600; font-size: 14px">Minimum changes before the limit applies</div><div class="sub">Small groups are not blocked for a few changes.</div></div><div style="width: 160px"><input type="text" value="10" aria-label="Minimum changes"></div></div>
+<div class="row"><div><div style="font-weight: 600; font-size: 14px">New groups start as dry run</div><div class="sub">Recommended. Switch off per group after checking the preview.</div></div><input class="sw" type="checkbox" role="switch" aria-label="New groups start as dry run" checked></div>
+</section>
+<section class="card" style="padding: 8px 20px">
+<h2 style="margin: 12px 0 4px; font-size: 16px; font-weight: 600">Rules</h2>
+<div class="row"><div><div style="font-weight: 600; font-size: 14px">Nested members</div><div class="sub">memberOf on groups this tool does not manage includes members of nested groups.</div></div><input class="sw" type="checkbox" role="switch" aria-label="Nested members" checked></div>
+</section>
+<section class="card" style="padding: 8px 20px">
+<h2 style="margin: 12px 0 4px; font-size: 16px; font-weight: 600">Group naming and marker</h2>
+<div class="row"><div style="flex: 1 1 300px"><div style="font-weight: 600; font-size: 14px">Name prefix</div><div class="sub">Added to groups the engine creates, and to adopted groups when Rename is ticked.</div></div><div style="display: flex; align-items: center; gap: 12px"><input class="sw" type="checkbox" role="switch" aria-label="Use name prefix" checked><div style="width: 140px"><input type="text" value="DG-" aria-label="Prefix text"></div></div></div>
+<div class="row"><div style="flex: 1 1 300px"><div style="font-weight: 600; font-size: 14px">Name suffix</div><div class="sub">For example “ (dynamic)”.</div></div><div style="display: flex; align-items: center; gap: 12px"><input class="sw" type="checkbox" role="switch" aria-label="Use name suffix"><div style="width: 140px"><input type="text" value="" placeholder="none" aria-label="Suffix text"></div></div></div>
+<div class="row"><div style="flex: 1 1 300px"><div style="font-weight: 600; font-size: 14px">Marker attribute on groups</div><div class="sub">Writes the definition ID to the group. Exchange: custom attribute number below.</div></div><div style="display: flex; align-items: center; gap: 12px"><input class="sw" type="checkbox" role="switch" aria-label="Write marker attribute"><div style="width: 140px"><select aria-label="Exchange custom attribute"><option>CustomAttribute15</option><option>CustomAttribute14</option></select></div></div></div>
+</section>
+<p class="muted" style="margin: 0; font-size: 13px">Infrastructure settings (tick, region, alert email) live in the deployment's settings file, not here.</p>
+</main>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1180}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

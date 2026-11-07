@@ -1,0 +1,9 @@
+{
+  "files.eol": "\n",
+  "powershell.scriptAnalysis.settingsPath": "PSScriptAnalyzerSettings.psd1",
+  "powershell.codeFormatting.preset": "OTBS",
+  "[powershell]": {
+    "editor.tabSize": 4,
+    "editor.formatOnSave": true
+  }
+}
