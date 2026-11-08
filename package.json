@@ -1,6 +1,7 @@
 {
   "name": "rdg-repo-tools",
   "private": true,
+  "license": "MIT",
   "description": "Repo-level checks. The web app has its own package.json in src/Web.",
   "type": "module",
   "engines": {
