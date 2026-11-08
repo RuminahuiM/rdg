@@ -2,7 +2,7 @@
 
 | | |
 | --- | --- |
-| Status | Proposed |
+| Status | Accepted (2026-11-08) |
 | Date | 2026-11-08 |
 | Decider | RuminahuiM |
 
