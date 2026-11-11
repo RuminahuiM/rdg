@@ -30,10 +30,10 @@ Describe 'Test-DgApiSchema' {
         }
     }
 
-    It 'names a field nested behind a reference' {
-        $body = '{"name":"Sales","groupType":"Security","target":{"mode":"elsewhere","groupId":"0b7d2c1e-5a4f-4e3b-9c8d-7f6e5d4c3b2a"},"rule":"user.department -eq \"Sales\""}'
+    It 'names a top-level field that sits behind allOf in the contract' {
+        $body = '{"name":"","groupType":"Security","target":{"mode":"existing","groupId":"0b7d2c1e-5a4f-4e3b-9c8d-7f6e5d4c3b2a"},"rule":"user.department -eq \"Sales\""}'
         $errors = @(Get-SchemaError -Json $body -Schema 'DefinitionInput')
-        $errors[0].field | Should -Be 'target.mode'
+        $errors[0].field | Should -Be 'name'
     }
 }
 

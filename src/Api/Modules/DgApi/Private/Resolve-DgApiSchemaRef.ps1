@@ -6,7 +6,9 @@ function Resolve-DgApiSchemaRef {
     .DESCRIPTION
         Test-Json reports an error with its path only when the failing keyword is reached through
         "properties". Errors behind $ref or allOf make the document invalid but come without a
-        message, so the API could not name the field.
+        message, so the API could not name the field. Inlining brings the fields of the request
+        body back to that level. Errors inside nested objects (for example target.mode) still
+        come without a message in PowerShell 7.6 and are answered as "(body)".
 
         Merging is the same as the original only when the two parts don't constrain the same
         keyword. So a $ref or allOf is merged only when the parts share nothing but annotations
