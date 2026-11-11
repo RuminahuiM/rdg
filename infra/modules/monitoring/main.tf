@@ -40,7 +40,7 @@ locals {
         runbooks    = ["Sync-EntraGroups"]
         # No status filter: every job counts. A Status dimension, even with "*", splits the
         # metric per status, and the series "Failed" (0 jobs) would fire while syncs run fine.
-        statuses    = []
+        statuses = []
       }
       job-stuck = {
         description = "A runbook job was suspended or stopped (for example by the 3-hour fair-share limit)."
