@@ -26,7 +26,7 @@ Design and plan: see [docs/](docs/README.md). Working rules: [CONTRIBUTING.md](C
 | `deploy/` | Azure DevOps pipeline template and deploy script for adopters |
 | `tests/` | Pester tests and the rule conformance suite |
 | `tools/` | Developer scripts (lint, build) |
-| `docs/` | Links to the design, operator docs later |
+| `docs/` | Design, operator guides and ADRs |
 
 ## License
 
