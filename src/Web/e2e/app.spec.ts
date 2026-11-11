@@ -165,7 +165,8 @@ test('activity: run details, likely cause and approval', async ({ page }) => {
   const panel = page.getByRole('complementary', { name: 'Run details' });
   await expect(panel).toContainText('Blocked by change limit.');
   await expect(panel).toContainText('the limit is 50 %');
-  await expect(panel).toContainText('Rule changed yesterday');
+  // The mock rule change is 17 h 35 min before now: "today" or "yesterday" depending on the hour.
+  await expect(panel).toContainText(/Rule changed (today|yesterday) .+ by Lea K\./);
   await expect(panel.getByRole('button', { name: 'Approve once' })).toBeVisible();
   await panel.getByRole('button', { name: 'Close details' }).click();
   await expect(panel).toBeHidden();
