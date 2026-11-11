@@ -4,15 +4,33 @@ Working rules for RDG. Short on purpose: if something isn't covered here, follow
 
 ## Workflow
 
-- Work follows the [implementation plan](docs/README.md): one step at a time, reviewed before the next one starts.
-- Branches: `main` is always releasable. Work branches are `step/<number>-<slug>`, for example `step/1.1-parser`, or `fix/<slug>` for fixes outside a step.
-- Commits use [Conventional Commits](https://www.conventionalcommits.org/) with the area as scope and the step in brackets:
-  - `feat(engine): parse -in and -notIn operators [1.1]`
-  - `fix(api): return 412 on stale ETag [3.2]`
-  - `docs: add settings reference [7.1]`
-  - Scopes: `engine`, `runbooks`, `api`, `web`, `infra`, `bootstrap`, `deploy`, `ci`, `docs`.
-- A change that departs from the design updates the design doc in the same step. The design docs are the source of truth; the code must not quietly disagree with them.
+RDG uses GitHub Flow ([ADR 0003](docs/adr/0003-branching-github-flow.md)). Every change, from a person or from the AI agent, takes the same path:
+
+1. **Issue.** Work starts from a GitHub issue. Small fixes may skip it, but the pull request then says what and why.
+2. **Branch.** Create a short-lived branch from `main`, named `<type>/<short-slug>`, for example `feat/notin-operator`, `fix/stale-etag`, `docs/install-guide`. The type is one of the commit types below.
+3. **Commits.** Commit in small steps using Conventional Commits (see below).
+4. **Pull request.** Open a pull request into `main` and fill in the template. Draft pull requests are fine for work in progress.
+5. **Checks.** CI must be green: lint, engine, contracts, web, infra and security.
+6. **Review.** The maintainer reviews the change: the diff, the tests and the checklist in the template. Pull requests from the AI agent are always reviewed and merged by the maintainer, never by the agent.
+7. **Merge.** Squash and merge is the default, so one pull request becomes one commit on `main` with the pull request title as its message. Merge commits and rebase are allowed when the single commits are worth keeping. Merged branches are deleted automatically.
+
+Rules that apply throughout:
+
+- `main` is always releasable. Nobody pushes to `main` directly.
+- A change that departs from the design updates the design doc in the same pull request. A decision with lasting effect on structure, tools or process gets an ADR in `docs/adr/`.
 - Everything is in English: code, comments, docs, commit messages.
+
+## Commit messages
+
+Commits and pull request titles use [Conventional Commits](https://www.conventionalcommits.org/): `<type>(<scope>): <summary>`.
+
+- Types: `feat` (new behaviour), `fix` (bug fix), `docs`, `test`, `refactor`, `perf`, `ci`, `build`, `chore`.
+- Scopes: `engine`, `runbooks`, `api`, `web`, `infra`, `bootstrap`, `deploy`, `ci`, `docs`. The scope is optional when a change spans several areas.
+- A breaking change gets a `!` after the type or scope (`feat(api)!: ...`) and a `BREAKING CHANGE:` line in the body.
+- Examples:
+  - `feat(engine): parse -in and -notIn operators`
+  - `fix(api): return 412 on stale ETag`
+  - `docs: add settings reference`
 
 ## Never commit
 
@@ -115,7 +133,13 @@ Applies to `infra/`.
 
 ## Versions
 
-- Semantic Versioning for releases (`v1.2.0`).
+- Releases follow [Semantic Versioning](https://semver.org/) (`MAJOR.MINOR.PATCH`):
+  - MAJOR for breaking changes: a changed contract, a removed setting, or anything an adopter must act on.
+  - MINOR for new features that keep existing installations working.
+  - PATCH for bug fixes.
+  - Pre-releases carry a suffix: `-rc.N` for release candidates, `-eval.N` for evaluation builds.
+- A release is a tag `vMAJOR.MINOR.PATCH` on `main`. The tag starts `release.yml`, which runs the full CI, builds the bundle and creates a draft release. The maintainer completes the release notes and publishes it.
+- Commit types point to the next version: `feat` raises MINOR, `fix` raises PATCH, `!` or `BREAKING CHANGE` raises MAJOR.
 - Dependencies are pinned to exact versions (npm lock file, OpenTofu lock file, PowerShell module versions in one place). Renovate proposes updates.
 
 ## License
