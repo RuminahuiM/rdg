@@ -118,8 +118,8 @@ $users = @(Invoke-RdgGraphRequest -Method GET -Uri '/users?$select=id,userPrinci
 $match = @($users | Where-Object { $_.department -eq $Department } | Sort-Object -Property userPrincipalName)
 if ($match.Count -lt 5) { throw "Department '$Department' has $($match.Count) active member users; the tests need at least 5." }
 if (-not $OtherDepartment) {
-    $OtherDepartment = ($users | Where-Object { $_.department -and $_.department -ne $Department } |
-        Group-Object -Property department | Sort-Object -Property Count -Descending | Select-Object -First 1).Name
+    $otherDepartments = $users | Where-Object { $_.department -and $_.department -ne $Department } | Group-Object -Property department
+    $OtherDepartment = ($otherDepartments | Sort-Object -Property Count -Descending | Select-Object -First 1).Name
 }
 $other = @($users | Where-Object { $_.department -eq $OtherDepartment } | Sort-Object -Property userPrincipalName)
 if ($other.Count -lt 5) { throw "Department '$OtherDepartment' has $($other.Count) active member users; the tests need at least 5." }

@@ -371,11 +371,10 @@ function Test-RdgDeployment {
             $client.Timeout = [TimeSpan]::FromSeconds(100)
             try {
                 $response = $client.GetAsync($Uri).GetAwaiter().GetResult()
-                [pscustomobject]@{
-                    StatusCode = [int]$response.StatusCode
-                    Content    = $response.Content.ReadAsStringAsync().GetAwaiter().GetResult()
-                    Location   = [string]$response.Headers.Location
-                }
+                $statusCode = [int]$response.StatusCode
+                $content = $response.Content.ReadAsStringAsync().GetAwaiter().GetResult()
+                $location = [string]$response.Headers.Location
+                [pscustomobject]@{ StatusCode = $statusCode; Content = $content; Location = $location }
             } finally {
                 $client.Dispose()
                 $handler.Dispose()
