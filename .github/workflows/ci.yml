@@ -108,8 +108,10 @@ jobs:
         run: npm run build
 
       - name: End-to-end tests against the mock build
+        # No --with-deps: the runner image already has the system libraries Chromium needs, and
+        # the extra apt step failed whenever the Ubuntu mirror could not be reached.
         run: |
-          npx playwright install --with-deps chromium
+          npx playwright install chromium
           npm run build:mock
           npm run test:e2e
 
