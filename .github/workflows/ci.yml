@@ -54,6 +54,29 @@ jobs:
           $pesterVersion = '5.7.1'
           Install-Module -Name Pester -RequiredVersion $pesterVersion -Scope CurrentUser -Force
 
+      - name: DEBUG
+        shell: pwsh
+        run: |
+          Import-Module Pester -RequiredVersion 5.7.1
+          "PS $($PSVersionTable.PSVersion) Pester $((Get-Module Pester).Version)"
+          function f { , [string[]]@() }
+          $r = (f); "paren count=$($r.Count) type=$($r.GetType().FullName)"
+          try { f | Should -HaveCount 0; 'pipe ok' } catch { "pipe FAIL: $_" }
+          try { Should -ActualValue (f) -HaveCount 0; 'actual ok' } catch { "actual FAIL: $_" }
+          try { @() | Should -HaveCount 0; 'empty pipe ok' } catch { "empty pipe FAIL: $_" }
+          try { $null | Should -HaveCount 0; 'null pipe ok' } catch { "null pipe FAIL: $_" }
+          try { Should -ActualValue @() -HaveCount 0; 'actual empty ok' } catch { "actual empty FAIL: $_" }
+          try { Should -ActualValue @(1) -HaveCount 1; 'actual one ok' } catch { "actual one FAIL: $_" }
+          try { , @(1,2) | Should -HaveCount 2; 'wrapped two ok' } catch { "wrapped two FAIL: $_" }
+          $schema = '{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"a":{"type":"integer"}},"additionalProperties":false}'
+          $ok = Test-Json -Json '{"a":"x","b":1}' -Schema $schema -ErrorVariable e -ErrorAction SilentlyContinue
+          "valid=$ok errors=$(@($e).Count)"
+          $e | ForEach-Object { "TJ: [" + $_.Exception.Message + "]" }
+          Import-Module ./src/DgEngine/DgEngine.psd1
+          . ./tests/DgEngine/Sync/SyncTestKit.ps1
+          $store = InModuleScope DgEngine { New-DgMemoryStore } -ErrorAction SilentlyContinue
+          Get-Command -Module DgEngine | Measure-Object | Select-Object -ExpandProperty Count
+
       - name: Rule conformance suite
         shell: pwsh
         run: ./tools/Invoke-RuleConformance.ps1
