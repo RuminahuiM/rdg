@@ -39,7 +39,7 @@ function Resolve-DgApiSchemaRef {
             $result[$key] = Resolve-DgApiSchemaRef -Node $Node[$key] -Definitions $Definitions -Depth ($Depth + 1)
         }
 
-        $parts = if ($result.Contains('allOf')) { @($result['allOf']) } else { @() }
+        $parts = @(if ($result.Contains('allOf')) { $result['allOf'] })
         if ($parts.Count -eq 1 -and $parts[0] -is [System.Collections.IDictionary]) {
             $part = $parts[0]
             $result.Remove('allOf')
