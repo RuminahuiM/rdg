@@ -72,7 +72,7 @@ Developed against a mock API (Mock Service Worker) generated from `openapi.yaml`
 - [x] **7.1 Install guide and settings reference.** From zero to running, for the private tenant first. *Done when:* you could follow it without asking.
 - [x] **7.2 Alert guide.** The "What to do" entries from Monitoring and Alerting. *Done when:* each alert links to its entry.
 
-Phase 7 docs live in Claude Docs for now: [RDG – Install Guide](https://claude.ai/code/artifact/e606f7a5-5d22-40ab-b09b-37f8ea1fe3cd) (with the settings reference) and [RDG – Alert Guide](https://claude.ai/code/artifact/0f3d23e8-973a-4393-be69-3196024fd622). Alerts name their guide section; they link to it once `alert_guide_url` is set.
+Phase 7 docs: [Install Guide](../guides/20-install-guide.md) (with the settings reference) and [Alert Guide](../guides/21-alert-guide.md). Alerts name their guide section; they link to it once `alert_guide_url` is set.
 
 ### Before publishing the repo
 
@@ -81,7 +81,7 @@ What has to be documented or changed before the repo goes public (after Phase 8,
 **Repo and links**
 
 - [ ] Create the public repo under your GitHub account and put `<owner>/rdg` into `rdgRepository` in `deploy/azure-pipelines.yml` (now `OWNER/rdg`) and into the attestation command in `.github/release-notes.md`
-- [ ] Replace the claude.ai links in `docs/README.md`; those pages are private and nobody else can open them
+- [x] Replace the claude.ai links in `docs/README.md`; those pages are private and nobody else can open them
 - [ ] Branch protection on `main` with the CI checks required; Renovate app installed; secret scanning and Dependabot alerts on
 
 **Operator docs into the repo**
