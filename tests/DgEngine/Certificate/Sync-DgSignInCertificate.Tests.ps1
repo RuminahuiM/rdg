@@ -35,9 +35,10 @@ BeforeAll {
         }.GetNewClosure()
         $vaultCer = $Vault.Base64
         $keyVault = InModuleScope DgEngine -Parameters @{ C = $vaultCer } {
-            # $C as a declared parameter: GetNewClosure only captures variables of the local scope.
+            # Copy into a local variable: GetNewClosure only captures variables of the local scope.
             param($C)
-            New-DgKeyVault -VaultUri 'https://rdg-contoso-kv.vault.azure.net' -Request { param($Path) @{ cer = $C; id = "https://rdg-contoso-kv.vault.azure.net$Path" } }.GetNewClosure()
+            $cer = $C
+            New-DgKeyVault -VaultUri 'https://rdg-contoso-kv.vault.azure.net' -Request { param($Path) @{ cer = $cer; id = "https://rdg-contoso-kv.vault.azure.net$Path" } }.GetNewClosure()
         }
         $outcome = [ordered]@{ Result = $null; Error = $null; Calls = $fake.State.Calls }
         try {
