@@ -59,7 +59,7 @@ $endpoint = "https://$($names.CosmosAccount).documents.azure.com"
 
 function Write-Step { param([string] $Message) Write-Information -InformationAction Continue -MessageData "-- $Message" }
 
-function Invoke-Cosmos {
+function Invoke-CosmosRequest {
     # One Cosmos DB REST call with your Entra token. Returns StatusCode and parsed Content.
     param([string] $Method, [string] $Path, [string] $PartitionKey, [string] $Body, [hashtable] $Headers = @{})
     $token = (Get-AzAccessToken -ResourceUrl $endpoint).Token
@@ -91,7 +91,7 @@ function Find-CosmosItem {
     do {
         $headers = @{ 'Content-Type' = 'application/query+json'; 'x-ms-documentdb-isquery' = 'True'; 'x-ms-documentdb-query-enablecrosspartition' = 'True' }
         if ($continuation) { $headers['x-ms-continuation'] = $continuation }
-        $response = Invoke-Cosmos -Method POST -Path "dbs/$database/colls/$Container/docs" -Body $body -Headers $headers
+        $response = Invoke-CosmosRequest -Method POST -Path "dbs/$database/colls/$Container/docs" -Body $body -Headers $headers
         if ($response.StatusCode -ne 200) { throw "Cosmos DB query on $Container answered $($response.StatusCode): $($response.Content | ConvertTo-Json -Compress)" }
         foreach ($item in @($response.Content['Documents'])) { $item }
         $continuation = $response.Continuation
@@ -145,7 +145,7 @@ try {
                 if (-not $items) { continue }
                 if ($PSCmdlet.ShouldProcess("$container/$label", "Delete $($items.Count) document(s)")) {
                     foreach ($item in $items) {
-                        $delete = Invoke-Cosmos -Method DELETE -Path "dbs/$database/colls/$container/docs/$([uri]::EscapeDataString([string]$item['id']))" -PartitionKey $partition
+                        $delete = Invoke-CosmosRequest -Method DELETE -Path "dbs/$database/colls/$container/docs/$([uri]::EscapeDataString([string]$item['id']))" -PartitionKey $partition
                         if ($delete.StatusCode -notin @(204, 404)) { throw "Deleting $container/$($item['id']) answered $($delete.StatusCode)" }
                     }
                 }

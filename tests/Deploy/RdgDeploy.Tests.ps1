@@ -212,10 +212,14 @@ Describe 'Get-RdgEncryptionSetting' {
 
 Describe 'Get-RdgAlertReceiverStatus' {
     It 'lists every email receiver and marks unconfirmed ones' {
-        $group = @{ properties = @{ emailReceivers = @(
+        $group = @{
+            properties = @{
+                emailReceivers = @(
                     @{ name = 'email-0'; emailAddress = 'ops@contoso.org'; status = 'Enabled' }
                     @{ name = 'email-1'; emailAddress = 'new@contoso.org'; status = 'NotSpecified' }
-                ) } }
+                )
+            }
+        }
         $receivers = @(Get-RdgAlertReceiverStatus -ActionGroup $group)
         $receivers | Should -HaveCount 2
         $receivers[0].Confirmed | Should -BeTrue

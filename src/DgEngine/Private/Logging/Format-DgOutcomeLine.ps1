@@ -16,22 +16,25 @@ function Format-DgOutcomeLine {
         [object] $Outcome
     )
 
-    $get = { param($name) Get-DgFieldValue -Object $Outcome -Name $name }
-    $result = [string](& $get 'Result')
-    $reason = [string](& $get 'DryRunReason')
-    $line = "$(& $get 'Name'): $result"
+    $field = @{}
+    foreach ($name in 'Name', 'Result', 'DryRunReason', 'MemberCount', 'Added', 'Removed', 'Skipped', 'DurationMs', 'Then', 'Error') {
+        $field[$name] = Get-DgFieldValue -Object $Outcome -Name $name
+    }
+    $result = [string]$field.Result
+    $reason = [string]$field.DryRunReason
+    $line = "$($field.Name): $result"
     if ($reason) { $line += " ($reason)" }
-    $members = & $get 'MemberCount'
+    $members = $field.MemberCount
     if ($null -ne $members) { $line += ", $members members" }
-    $line += ", +$([int](& $get 'Added'))/-$([int](& $get 'Removed')), $([int](& $get 'Skipped')) skipped, $([long](& $get 'DurationMs')) ms"
-    $then = & $get 'Then'
+    $line += ", +$([int]$field.Added)/-$([int]$field.Removed), $([int]$field.Skipped) skipped, $([long]$field.DurationMs) ms"
+    $then = $field.Then
     if ($then) {
         $thenResult = [string](Get-DgFieldValue -Object $then -Name 'result')
         $thenDetail = [string](Get-DgFieldValue -Object $then -Name 'message')
         $line += "; then $thenResult"
         if ($thenDetail) { $line += ": $thenDetail" }
     }
-    $errorText = [string](& $get 'Error')
+    $errorText = [string]$field.Error
     if ($errorText) { $line += "; error: $errorText" }
     $line
 }
