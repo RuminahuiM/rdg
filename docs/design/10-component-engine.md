@@ -202,7 +202,7 @@ tests/
 ```
 
 - **Unit tests (Pester):** every grammar rule, every operator, every row of the property map, every safety brake.
-- **Rule corpus:** a growing set of real-world rules with expected results, including the structure of the HEKS EOP rule with invented values (no real tenant data in the repo); every bug becomes a new entry.
+- **Rule corpus:** a growing set of real-world rules with expected results, including the structure of a real EOP policy rule with invented values (no real tenant data in the repo); every bug becomes a new entry.
 - **Writers:** tested against mocked Graph and Exchange calls.
 - **Parity:** before go-live, Compare-DgWithEntra runs against existing Entra dynamic groups in a test tenant.
 
@@ -232,9 +232,9 @@ Adopting a group that is a Microsoft dynamic group works like any adoption, with
 
 To verify in the test tenant: that members are kept during the conversion. Microsoft's own sample does it the same way, but the docs don't say so explicitly.
 
-## Scale at HEKS
+## Design scale
 
-About 2,000 users in the tenant, about 800 in the scope of RDG rules, and a modest number of groups. The engine reads all users once per run (a few paged Graph calls with `$select`), so a run is expected to take well under a minute, even at a 3-minute tick. No sharding or delta queries needed in the MVP.
+A mid-sized tenant: a few thousand users, a part of them in the scope of RDG rules, and a modest number of groups. The numbers below assume 2,000 users. The engine reads all users once per run (a few paged Graph calls with `$select`), so a run is expected to take well under a minute, even at a 3-minute tick. No sharding or delta queries needed in the MVP.
 
 ## Open questions
 
@@ -262,7 +262,7 @@ About 2,000 users in the tenant, about 800 in the scope of RDG rules, and a mode
   - memberOf accepts `-any (group.objectId -in [...])` and `-eq`; anything else inside memberOf is refused, as only that form is documented;
   - `sipProxyAddress` is read from the `SIP:` entry of proxyAddresses, without the prefix; to verify in the test tenant;
   - validation returns all errors after the first syntax error is fixed, and suggests the closest property name for typos.
-- **Measured speed (step 1.2):** a HEKS-style rule with three conditions takes about 1.7 s for 2,000 users in plain PowerShell; a simple comparison about 0.25 s. Good enough for the MVP; if a tenant has many definitions, compiling rules to faster delegates is the obvious optimisation.
+- **Measured speed (step 1.2):** an EOP-style rule with three conditions takes about 1.7 s for 2,000 users in plain PowerShell; a simple comparison about 0.25 s. Good enough for the MVP; if a tenant has many definitions, compiling rules to faster delegates is the obvious optimisation.
 - **Group references (step 1.3):** a run evaluates the due definitions plus everything they depend on, dependencies first. Precisions:
   - a memberOf group RDG manages always uses that definition's result from the same run (after its filters), even if the definition is disabled or not due;
   - each group RDG doesn't manage is read once per run, nested or direct according to the setting;

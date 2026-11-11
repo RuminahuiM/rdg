@@ -4,7 +4,7 @@
 .SYNOPSIS
     Creates invented, cloud-only test users (and a few guests) in a TEST tenant.
 .DESCRIPTION
-    For the test installation described in the Infrastructure design ("Testing before HEKS"):
+    For the test installation described in the Infrastructure design ("Testing before production"):
     users RDG Test 01..NN (rdgtestNN@<domain>) with department, job title, city, country,
     employee ID and extensionAttribute1-3 set, extensionAttribute15 = rdg-test, every fifth one
     disabled; and guests rdgguestNN@example.com, invited without an email. Passwords are random

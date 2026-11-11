@@ -141,7 +141,7 @@ Residual risk: whoever holds RDG Admin effectively controls membership of every 
 ## Decisions
 
 1. **Group.ReadWrite.All** is granted to the engine in the MVP. Narrowing it is a later-version task.
-2. **Admin and Reader groups** are a deployment setting, not hard-coded for HEKS. If none are named, bootstrap creates its own groups.
+2. **Admin and Reader groups** are a deployment setting, not hard-coded for one organisation. If none are named, bootstrap creates its own groups.
 3. **Certificate renewal** is automated in the MVP: Renew-SignInCertificate and the maintenance identity.
 4. **No blocked-groups list** in the MVP.
 

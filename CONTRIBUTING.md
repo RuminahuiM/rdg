@@ -36,7 +36,7 @@ Commits and pull request titles use [Conventional Commits](https://www.conventio
 
 - Secrets of any kind: keys, tokens, connection strings, certificates, passwords. RDG uses managed identities and federation; there should be nothing to commit.
 - Real settings files (`*.tfvars` outside `examples/`), state files, `local.settings.json`, `.env`.
-- Real tenant data: user names, UPNs, group names or IDs from HEKS or any other tenant. Tests and examples use invented data (`contoso.org`, `alex.example@contoso.org`).
+- Real tenant data: user names, UPNs, group names or IDs from any real tenant. Tests and examples use invented data (`contoso.org`, `alex.example@contoso.org`).
 
 ## PowerShell
 

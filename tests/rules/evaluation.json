@@ -384,7 +384,7 @@
       ]
     },
     {
-      "id": "heks-style",
+      "id": "eop-style",
       "rule": "(user.extensionAttribute1 -in [\"MGMT1\",\"MGMT2\"]) -or (user.extensionAttribute2 -in [\"MGMT1\",\"MGMT2\"]) -or (user.extensionAttribute3 -startsWith \"OPS\")",
       "matches": [
         "alex",
@@ -392,7 +392,7 @@
         "manager",
         "sam"
       ],
-      "note": "structure of the HEKS EOP rule"
+      "note": "structure of a real EOP policy rule, invented values"
     },
     {
       "id": "directory-extension",

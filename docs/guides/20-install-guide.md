@@ -45,7 +45,7 @@ Create the repo you'll use in Azure DevOps (for example `rdg-deploy`) and copy `
 Fill these now:
 
 - `environment`, `name_prefix` – the two names you picked
-- `location` – region for everything except the web app (HEKS: `switzerlandnorth`)
+- `location` – region for everything except the web app (for example `switzerlandnorth`)
 - `swa_location` – region for the web app; Static Web Apps isn't offered in Switzerland, so `westeurope`
 - `tenant_domain` – the initial domain, `<name>.onmicrosoft.com`
 - `alert_emails` – who gets the alerts (a distribution list works)
