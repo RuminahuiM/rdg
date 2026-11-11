@@ -1,17 +1,25 @@
 {
   "name": "main",
   "target": "branch",
+  "source_type": "Repository",
+  "source": "RuminahuiM/rdg",
   "enforcement": "active",
   "conditions": {
     "ref_name": {
-      "include": ["~DEFAULT_BRANCH"],
+      "include": [
+        "~DEFAULT_BRANCH"
+      ],
       "exclude": []
     }
   },
   "bypass_actors": [],
   "rules": [
-    { "type": "deletion" },
-    { "type": "non_fast_forward" },
+    {
+      "type": "deletion"
+    },
+    {
+      "type": "non_fast_forward"
+    },
     {
       "type": "pull_request",
       "parameters": {
@@ -20,7 +28,11 @@
         "require_code_owner_review": false,
         "require_last_push_approval": false,
         "required_review_thread_resolution": false,
-        "allowed_merge_methods": ["merge", "squash", "rebase"]
+        "allowed_merge_methods": [
+          "merge",
+          "squash",
+          "rebase"
+        ]
       }
     },
     {
@@ -29,12 +41,30 @@
         "strict_required_status_checks_policy": false,
         "do_not_enforce_on_create": false,
         "required_status_checks": [
-          { "context": "powershell lint", "integration_id": 15368 },
-          { "context": "engine (Pester, rule conformance)", "integration_id": 15368 },
-          { "context": "contracts (JSON schemas, fixtures, OpenAPI)", "integration_id": 15368 },
-          { "context": "web (lint, unit, build, e2e)", "integration_id": 15368 },
-          { "context": "infra (OpenTofu, TFLint, plan tests)", "integration_id": 15368 },
-          { "context": "security (Trivy configuration scan, npm audit)", "integration_id": 15368 }
+          {
+            "context": "powershell lint",
+            "integration_id": 15368
+          },
+          {
+            "context": "engine (Pester, rule conformance)",
+            "integration_id": 15368
+          },
+          {
+            "context": "contracts (JSON schemas, fixtures, OpenAPI)",
+            "integration_id": 15368
+          },
+          {
+            "context": "web (lint, unit, build, e2e)",
+            "integration_id": 15368
+          },
+          {
+            "context": "infra (OpenTofu, TFLint, plan tests)",
+            "integration_id": 15368
+          },
+          {
+            "context": "security (Trivy configuration scan, npm audit)",
+            "integration_id": 15368
+          }
         ]
       }
     }
