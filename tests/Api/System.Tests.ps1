@@ -99,7 +99,8 @@ Describe 'Settings' {
         $updated.StatusCode | Should -Be 200
         $updated.Body.paused | Should -BeTrue
         $updated.Body.pausedBy | Should -Be 'boss@contoso.org'
-        $updated.Body.pausedAt | Should -Be '2026-10-12T08:00:00.000Z'
+        # Check the wire format; ConvertFrom-Json turns the string into a DateTime.
+        $updated.Raw | Should -Match '"pausedAt"\s*:\s*"2026-10-12T08:00:00\.000Z"'
         $updated.Body.changeLimitPercent | Should -Be 40
         $audit = (Get-StoredDocument -Store $world.Store -Container config -Type audit)
         $audit[0]['pk'] | Should -Be 'settings'
@@ -107,7 +108,7 @@ Describe 'Settings' {
 
         $resumed = Invoke-Api -Method PUT -Route 'settings' -Body (Get-SettingsInput -Change @{ paused = $false }) -IfMatch $updated.Body.etag
         $resumed.Body.pausedBy | Should -BeNullOrEmpty
-        Test-StoredDocumentSchema -Store $world.Store | Should -HaveCount 0
+        (Test-StoredDocumentSchema -Store $world.Store) | Should -HaveCount 0
     }
 
     It 'refuses settings outside the contract' {

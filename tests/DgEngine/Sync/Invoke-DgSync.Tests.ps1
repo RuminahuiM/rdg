@@ -53,8 +53,8 @@ Describe 'Invoke-DgSync: a normal run' {
         $runs[0]['result'] | Should -Be 'OK'
         $heartbeat = Get-StoredDocument -Store $store -Container state -Type heartbeat
         $heartbeat[0]['userCount'] | Should -Be 4
-        Get-StoredDocument -Store $store -Container state -Type lock | Should -HaveCount 0
-        Test-StoredDocumentSchema -Store $store | Should -HaveCount 0
+        (Get-StoredDocument -Store $store -Container state -Type lock) | Should -HaveCount 0
+        (Test-StoredDocumentSchema -Store $store) | Should -HaveCount 0
     }
 
     It 'leaves no run record when nothing changed' {
@@ -64,10 +64,10 @@ Describe 'Invoke-DgSync: a normal run' {
 
         $result = Invoke-TestSync -Store $store -Tenant $tenant
         $result.Result | Should -Be 'Succeeded'
-        Get-RunRecord $store | Should -HaveCount 0
+        (Get-RunRecord $store) | Should -HaveCount 0
         (Get-Status $store)['lastResult'] | Should -Be 'OK'
         (Get-Status $store)['lastSyncUtc'] | Should -Not -BeNullOrEmpty
-        Test-StoredDocumentSchema -Store $store | Should -HaveCount 0
+        (Test-StoredDocumentSchema -Store $store) | Should -HaveCount 0
     }
 
     It 'skips definitions that are not due and does not read users then' {
@@ -107,7 +107,7 @@ Describe 'Invoke-DgSync: lock and pause' {
         $runs[0]['result'] | Should -Be 'SkippedTick'
         $runs[0]['pk'] | Should -Be 'system'
         Get-Status $store | Should -BeNullOrEmpty
-        Test-StoredDocumentSchema -Store $store | Should -HaveCount 0
+        (Test-StoredDocumentSchema -Store $store) | Should -HaveCount 0
     }
 
     It 'takes over an expired lock' {
@@ -122,7 +122,7 @@ Describe 'Invoke-DgSync: lock and pause' {
 
         $result = Invoke-TestSync -Store $store -Tenant $tenant
         $result.Result | Should -Be 'Succeeded'
-        Get-StoredDocument -Store $store -Container state -Type lock | Should -HaveCount 0
+        (Get-StoredDocument -Store $store -Container state -Type lock) | Should -HaveCount 0
     }
 
     It 'does nothing but record the pause and the heartbeat when paused' {
@@ -135,7 +135,7 @@ Describe 'Invoke-DgSync: lock and pause' {
         (Get-RunRecord $store)[0]['reason'] | Should -Be 'paused by admin@contoso.org'
         (Get-StoredDocument -Store $store -Container state -Type heartbeat)[0]['paused'] | Should -BeTrue
         $tenant.Calls | Should -HaveCount 0
-        Test-StoredDocumentSchema -Store $store | Should -HaveCount 0
+        (Test-StoredDocumentSchema -Store $store) | Should -HaveCount 0
     }
 }
 
@@ -166,7 +166,7 @@ Describe 'Invoke-DgSync: safety' {
         $status['usedApprovalHash'] | Should -Be $definition.approval.diffHash
         $status['pendingApproval'] | Should -BeNullOrEmpty
         (Get-RunRecord $store).Where({ $_['approval'] }) | Should -HaveCount 2
-        Test-StoredDocumentSchema -Store $store | Should -HaveCount 0
+        (Test-StoredDocumentSchema -Store $store) | Should -HaveCount 0
     }
 
     It 'refuses a user list far smaller than last time, writes nothing and keeps the old count' {
@@ -184,10 +184,10 @@ Describe 'Invoke-DgSync: safety' {
         $result.Message | Should -BeLike '*fewer than 80 %*'
         (Get-Status $store)['lastResult'] | Should -Be 'OK'
         (Get-Status $store)['lastSyncUtc'] | Should -Be ([datetime]'2026-10-12T07:00:00Z').ToUniversalTime()
-        Get-RunRecord $store | Should -HaveCount 0
+        (Get-RunRecord $store) | Should -HaveCount 0
         Get-MemberList $tenant (Get-TestGroupId 1) | Should -Be (Get-TestUserId 1)
         (Get-StoredDocument -Store $store -Container state -Type heartbeat)[0]['userCount'] | Should -Be 100
-        Test-StoredDocumentSchema -Store $store | Should -HaveCount 0
+        (Test-StoredDocumentSchema -Store $store) | Should -HaveCount 0
     }
 
     It 'only reports in read-only mode' {
@@ -205,7 +205,7 @@ Describe 'Invoke-DgSync: safety' {
         (Get-RunRecord $store)[0]['dryRun'] | Should -BeTrue
         (Get-RunRecord $store)[0]['then']['result'] | Should -Be 'OK'
         (Get-StoredDocument -Store $store -Container state -Type heartbeat)[0]['accessMode'] | Should -Be 'read-only'
-        Test-StoredDocumentSchema -Store $store | Should -HaveCount 0
+        (Test-StoredDocumentSchema -Store $store) | Should -HaveCount 0
     }
 
     It 'writes its own verbose lines with verbose logging on: counts only, no URLs or user names' {
@@ -239,7 +239,7 @@ Describe 'Invoke-DgSync: safety' {
         (Get-Status $store -Number 2)['lastResult'] | Should -Be 'Error'
         (Get-Status $store -Number 2)['lastError'] | Should -BeLike '*not valid*'
         $tenant.Groups[(Get-TestGroupId 1)].Members.Count | Should -Be 2
-        Test-StoredDocumentSchema -Store $store | Should -HaveCount 0
+        (Test-StoredDocumentSchema -Store $store) | Should -HaveCount 0
     }
 
     It 'reports a missing target group as an error' {
@@ -337,7 +337,7 @@ Describe 'Invoke-DgSync: new and adopted groups' {
         # Third run uses the stored group and creates nothing new.
         [void](Invoke-TestSync -Store $store -Tenant $tenant -Now '2026-10-12T08:06:00Z')
         $tenant.Groups.Count | Should -Be 1
-        Test-StoredDocumentSchema -Store $store | Should -HaveCount 0
+        (Test-StoredDocumentSchema -Store $store) | Should -HaveCount 0
     }
 
     It 'waits for approval of an adoption, then converts, renames and syncs the group' {
@@ -366,7 +366,7 @@ Describe 'Invoke-DgSync: new and adopted groups' {
         $tenant.Groups[(Get-TestGroupId 1)].DisplayName | Should -Be 'DG-Sales (dynamic)'
         Get-MemberList $tenant (Get-TestGroupId 1) | Should -Be ((Get-TestUserId 1), (Get-TestUserId 2) -join ',')
         (Get-Status $store)['usedApprovalHash'] | Should -Be $approved.approval.diffHash
-        Test-StoredDocumentSchema -Store $store | Should -HaveCount 0
+        (Test-StoredDocumentSchema -Store $store) | Should -HaveCount 0
     }
 }
 
@@ -417,7 +417,7 @@ Describe 'Invoke-DgSync: sync now, references, compare, Exchange' {
         $compare = (Get-Status $store)['compare']
         $compare['onlyInRdg'] | Should -Be 1
         $compare['onlyInCompare'] | Should -Be 1
-        Test-StoredDocumentSchema -Store $store | Should -HaveCount 0
+        (Test-StoredDocumentSchema -Store $store) | Should -HaveCount 0
     }
 
     It 'syncs an Exchange group and skips users without a mailbox' {
@@ -435,7 +435,7 @@ Describe 'Invoke-DgSync: sync now, references, compare, Exchange' {
         $status['skipped'] | Should -Be 1
         (Get-RunRecord $store)[0]['skipped'][0]['upn'] | Should -Be 'user2@contoso.org'
         (Get-StoredDocument -Store $store -Container state -Type heartbeat)[0]['id'] | Should -Be 'heartbeat-Exchange'
-        Test-StoredDocumentSchema -Store $store | Should -HaveCount 0
+        (Test-StoredDocumentSchema -Store $store) | Should -HaveCount 0
     }
 }
 
@@ -456,7 +456,7 @@ Describe 'Invoke-DgSync: runbook behaviour' {
         ($waits -join ',') | Should -Be '15,15,15,15,15,15,15,15'
         (Get-RunRecord $store)[0]['reason'] | Should -BeLike 'deferred:*'
         Get-Status $store | Should -BeNullOrEmpty
-        Test-StoredDocumentSchema -Store $store | Should -HaveCount 0
+        (Test-StoredDocumentSchema -Store $store) | Should -HaveCount 0
     }
 
     It 'stops at the time limit, leaves the rest for the next tick and fails the job' {

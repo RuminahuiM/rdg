@@ -37,7 +37,7 @@ Describe 'POST /api/definitions/{id}/sync' {
         $world.Jobs[0].Parameters.DefinitionId | Should -Be $created.id
         (Invoke-Api -Route 'definitions/{id}' -Params @{ id = $created.id }).Body.syncRequest.by | Should -Be 'admin@contoso.org'
         (Get-StoredDocument -Store $world.Store -Container config -Type audit).Where({ $_['action'] -eq 'syncNow' }) | Should -HaveCount 1
-        Test-StoredDocumentSchema -Store $world.Store | Should -HaveCount 0
+        (Test-StoredDocumentSchema -Store $world.Store) | Should -HaveCount 0
     }
 
     It 'returns the open request instead of starting another job within a minute' {
@@ -97,7 +97,7 @@ Describe 'POST /api/definitions/{id}/approve' {
         $approved.Body.approval.by | Should -Be 'admin@contoso.org'
         $approved.Headers['ETag'] | Should -Be $approved.Body.etag
         (Get-StoredDocument -Store $world.Store -Container config -Type audit).Where({ $_['action'] -eq 'approve' }) | Should -HaveCount 1
-        Test-StoredDocumentSchema -Store $world.Store | Should -HaveCount 0
+        (Test-StoredDocumentSchema -Store $world.Store) | Should -HaveCount 0
     }
 
     It 'marks an adoption as adopted' {
