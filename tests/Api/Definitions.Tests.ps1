@@ -28,7 +28,7 @@ Describe 'POST /api/definitions' {
         $audit[0]['action'] | Should -Be 'create'
         $audit[0]['pk'] | Should -Be $response.Body.id
         $audit[0]['ttl'] | Should -Be (60 * 86400)
-        Test-StoredDocumentSchema -Store $world.Store | Should -HaveCount 0
+        (Test-StoredDocumentSchema -Store $world.Store) | Should -HaveCount 0
     }
 
     It 'refuses readers' {
@@ -101,7 +101,7 @@ Describe 'POST /api/definitions' {
         $created.target.mode | Should -Be 'create'
         $bad = Invoke-Api -Method POST -Route 'definitions' -Body @{ name = 'New'; groupType = 'Security'; target = @{ mode = 'create'; displayName = 'X'; groupId = (Get-TestGroupId 1) }; rule = 'user.city -eq "Bern"' }
         $bad.StatusCode | Should -Be 400
-        Test-StoredDocumentSchema -Store $world.Store | Should -HaveCount 0
+        (Test-StoredDocumentSchema -Store $world.Store) | Should -HaveCount 0
     }
 
     It 'checks memberOf groups and the compare group' {
@@ -200,12 +200,13 @@ Describe 'PUT /api/definitions/{id}' {
         $ok.StatusCode | Should -Be 200
         $ok.Body.rule | Should -Be 'user.department -eq "Finance"'
         $ok.Body.updatedBy | Should -Be 'sam@contoso.org'
-        $ok.Body.updatedAt | Should -Be '2026-10-12T09:00:00.000Z'
-        $ok.Body.createdAt | Should -Be '2026-10-12T08:00:00.000Z'
+        # Check the wire format; ConvertFrom-Json turns the strings into DateTime values.
+        $ok.Raw | Should -Match '"updatedAt"\s*:\s*"2026-10-12T09:00:00\.000Z"'
+        $ok.Raw | Should -Match '"createdAt"\s*:\s*"2026-10-12T08:00:00\.000Z"'
         $ok.Headers['ETag'] | Should -Not -Be $created.etag
         $audit = (Get-StoredDocument -Store $world.Store -Container config -Type audit).Where({ $_['action'] -eq 'update' })
         ($audit[0]['changes'] | ForEach-Object { $_['field'] }) -join ',' | Should -Be 'rule,dryRun'
-        Test-StoredDocumentSchema -Store $world.Store | Should -HaveCount 0
+        (Test-StoredDocumentSchema -Store $world.Store) | Should -HaveCount 0
     }
 
     It 'writes nothing when nothing changed' {
@@ -249,7 +250,7 @@ Describe 'DELETE /api/definitions/{id}' {
         (Invoke-Api -Route 'definitions/{id}' -Params @{ id = $sales.id }).StatusCode | Should -Be 404
         (Get-StoredDocument -Store $world.Store -Container config -Type audit).Where({ $_['pk'] -eq $sales.id }) | Should -HaveCount 2
         (Get-StoredDocument -Store $world.Store -Container state -Type status).Where({ $_['pk'] -eq $sales.id }) | Should -HaveCount 0
-        Test-StoredDocumentSchema -Store $world.Store | Should -HaveCount 0
+        (Test-StoredDocumentSchema -Store $world.Store) | Should -HaveCount 0
     }
 }
 
