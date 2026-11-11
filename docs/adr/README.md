@@ -4,6 +4,6 @@ Important decisions for RDG are recorded here as ADRs. Each ADR describes the co
 
 | ADR | Title | Status | Date |
 | --- | --- | --- | --- |
-| [0001](0001-deploy-test-environment-with-github-actions.md) | Deploy the test environment with GitHub Actions | Proposed | 2026-11-08 |
+| [0001](0001-deploy-test-environment-with-github-actions.md) | Deploy the test environment with GitHub Actions | Accepted | 2026-11-08 |
 
 Status values: Proposed, Accepted, Superseded, Deprecated.
