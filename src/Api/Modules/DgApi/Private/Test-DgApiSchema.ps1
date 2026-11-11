@@ -24,7 +24,14 @@ function Test-DgApiSchema {
 
     if (-not $script:DgApiSchemas.ContainsKey($Schema)) {
         $definitions = (ConvertTo-Json -InputObject (Get-DgOpenApi).components.schemas -Depth 60 -Compress) -replace '#/components/schemas/', '#/$defs/'
-        $script:DgApiSchemas[$Schema] = '{"$schema":"https://json-schema.org/draft/2020-12/schema","$ref":"#/$defs/' + $Schema + '","$defs":' + $definitions + '}'
+        $all = ConvertFrom-Json -InputObject $definitions -AsHashtable
+        # Inline the component: Test-Json only names the failing field for errors it reaches
+        # through "properties", not behind $ref or allOf.
+        $inline = Resolve-DgApiSchemaRef -Node $all[$Schema] -Definitions $all
+        $document = [ordered]@{ '$schema' = 'https://json-schema.org/draft/2020-12/schema' }
+        foreach ($key in $inline.Keys) { $document[$key] = $inline[$key] }
+        $document['$defs'] = $all
+        $script:DgApiSchemas[$Schema] = ConvertTo-Json -InputObject $document -Depth 100 -Compress
     }
     $failures = $null
     $valid = Test-Json -Json $Json -Schema $script:DgApiSchemas[$Schema] -ErrorVariable failures -ErrorAction SilentlyContinue
