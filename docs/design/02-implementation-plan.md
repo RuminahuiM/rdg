@@ -82,7 +82,8 @@ What has to be documented or changed before the repo goes public (after Phase 8,
 
 - [ ] Create the public repo under your GitHub account and put `<owner>/rdg` into `rdgRepository` in `deploy/azure-pipelines.yml` (now `OWNER/rdg`) and into the attestation command in `.github/release-notes.md`
 - [x] Replace the claude.ai links in `docs/README.md`; those pages are private and nobody else can open them
-- [ ] Branch protection on `main` with the CI checks required; Renovate app installed; secret scanning and Dependabot alerts on
+- [x] Branch protection on `main` with the CI checks required (ruleset in `.github/rulesets/main.json`, see CONTRIBUTING)
+- [ ] Renovate app installed; secret scanning and Dependabot alerts on
 
 **Operator docs into the repo**
 
