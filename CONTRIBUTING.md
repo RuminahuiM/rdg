@@ -20,6 +20,20 @@ Rules that apply throughout:
 - A change that departs from the design updates the design doc in the same pull request. A decision with lasting effect on structure, tools or process gets an ADR in `docs/adr/`.
 - Everything is in English: code, comments, docs, commit messages.
 
+## Repository settings
+
+`main` is protected by a ruleset, kept as code in [`.github/rulesets/main.json`](.github/rulesets/main.json). After a change to that file, import it again under **Settings > Rules > Rulesets** (replace the existing `main` ruleset).
+
+| Setting | Value | Why |
+| --- | --- | --- |
+| Changes to `main` | Only through a pull request | Every change takes the same path, also the AI agent's |
+| Required checks | All six CI jobs: `powershell lint`, `engine`, `contracts`, `web`, `infra`, `security` | A red pull request cannot be merged |
+| Required approvals | None | One maintainer; GitHub does not allow approving your own pull request. CI and self-review are the gate |
+| Force push and deletion of `main` | Blocked | History on `main` stays as it is |
+| Bypass | Nobody, the owner included | The rules also apply to the maintainer |
+| Merge methods | Squash (default), merge commit, rebase | See the workflow above |
+| Delete head branches after merge | On (Settings > General) | Keeps the branch list short |
+
 ## Commit messages
 
 Commits and pull request titles use [Conventional Commits](https://www.conventionalcommits.org/): `<type>(<scope>): <summary>`.
