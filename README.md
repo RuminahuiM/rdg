@@ -2,7 +2,7 @@
 
 Rule-based membership for Microsoft 365 groups of any type: Security, Microsoft 365, mail-enabled security groups and distribution lists. You write a rule in Entra dynamic-group syntax; RDG evaluates it on a schedule and keeps the group's members in sync as ordinary static members, so the group works everywhere a static group does (for example as recipients in Defender preset policies).
 
-> **Status:** private, pre-release. Not ready for use. Name is temporary.
+> **Status:** pre-release. Not ready for use. Name is temporary.
 
 ## How it works
 
@@ -27,3 +27,7 @@ Design and plan: see [docs/](docs/README.md). Working rules: [CONTRIBUTING.md](C
 | `tests/` | Pester tests and the rule conformance suite |
 | `tools/` | Developer scripts (lint, build) |
 | `docs/` | Links to the design, operator docs later |
+
+## License
+
+RDG is licensed under the [MIT License](LICENSE).

@@ -117,3 +117,7 @@ Applies to `infra/`.
 
 - Semantic Versioning for releases (`v1.2.0`).
 - Dependencies are pinned to exact versions (npm lock file, OpenTofu lock file, PowerShell module versions in one place). Renovate proposes updates.
+
+## License
+
+RDG is licensed under the [MIT License](LICENSE). By contributing, you agree that your contributions are licensed under the same license.

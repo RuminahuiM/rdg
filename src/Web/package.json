@@ -1,6 +1,7 @@
 {
   "name": "rdg-web",
   "private": true,
+  "license": "MIT",
   "version": "0.1.0",
   "description": "RDG web app: manage rule-based group definitions, runs, audit and settings.",
   "type": "module",
