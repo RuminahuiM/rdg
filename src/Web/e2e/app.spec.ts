@@ -157,6 +157,9 @@ test('delete: references read the group live; confirm by name', async ({ page })
 });
 
 test('activity: run details, likely cause and approval', async ({ page }) => {
+  // Fixed clock: the mock data is relative to now, and the panel words the rule change as
+  // "today" or "yesterday". At 18:45 the change (17 h 35 min earlier) is today at 01:10.
+  await page.clock.setFixedTime(new Date('2026-10-12T18:45:00'));
   await open(page, '/activity');
   await page
     .getByRole('row', { name: /Intune – Field Laptops/ })
@@ -165,8 +168,7 @@ test('activity: run details, likely cause and approval', async ({ page }) => {
   const panel = page.getByRole('complementary', { name: 'Run details' });
   await expect(panel).toContainText('Blocked by change limit.');
   await expect(panel).toContainText('the limit is 50 %');
-  // The mock rule change is 17 h 35 min before now: "today" or "yesterday" depending on the hour.
-  await expect(panel).toContainText(/Rule changed (today|yesterday) .+ by Lea K\./);
+  await expect(panel).toContainText('Rule changed today 01:10 by Lea K.');
   await expect(panel.getByRole('button', { name: 'Approve once' })).toBeVisible();
   await panel.getByRole('button', { name: 'Close details' }).click();
   await expect(panel).toBeHidden();
