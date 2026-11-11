@@ -93,7 +93,7 @@ What has to be documented or changed before the repo goes public (after Phase 8,
 **Design docs**
 
 - [ ] Decide what of the component designs goes public: export as Markdown to `docs/design/`, or a shorter architecture overview
-- [ ] Remove or reword HEKS references in published text: "Testing before HEKS" (bootstrap comments), the rule examples named after the HEKS EOP rule in `tests/rules/` (structure only, invented values, but the name stays)
+- [x] Remove or reword references to the first adopter in published text: "Testing before …" (bootstrap comments), the rule examples named after its EOP rule in `tests/rules/`
 
 **Project files that don't exist yet**
 
@@ -122,17 +122,17 @@ Everything above is built and reviewed before anything touches a tenant. From he
 - [ ] **8.6 Operations.** Force a certificate renewal, trigger each alert once, run an upgrade to a new version and a rollback. *Done when:* every alert email arrived and both pipeline runs passed.
 - [ ] **8.7 Release v1.0.0-rc.** Fixes from 8.2–8.6 merged and tagged. *Done when:* a clean install of the tag passes 8.2 and 8.3 again.
 
-### Phase 9 – HEKS read-only
+### Phase 9 – First production tenant, read-only
 
-- [ ] **9.1 Install at HEKS** with `access_mode = read-only`, region Switzerland North, real Admin and Reader groups. *Done when:* smoke test green.
+- [ ] **9.1 Install in the production tenant** with `access_mode = read-only`, its own region, real Admin and Reader groups. *Done when:* smoke test green.
 - [ ] **9.2 Rebuild the existing dynamic groups** as RDG definitions with compare groups, starting with the EOP Strict group. *Done when:* compare lists are empty or every difference is explained.
 - [ ] **9.3 Observe** for one to two weeks: run times, warnings, alerts, cost. *Done when:* nothing unexplained is left.
 
-### Phase 10 – HEKS live
+### Phase 10 – First production tenant, live
 
 - [ ] **10.1 Switch to read-write.** Stage 2 rerun, pipeline run. *Done when:* write grants are in place and all definitions did their forced dry run.
 - [ ] **10.2 Migrate group by group.** EOP Strict first, one group at a time, each through dry run and approval. *Done when:* all planned groups are managed by RDG.
-- [ ] **10.3 Release v1.0.0.** *Done when:* tagged and the HEKS installation runs on it.
+- [ ] **10.3 Release v1.0.0.** *Done when:* tagged and the production installation runs on it.
 
 ## Assumptions to verify in the test tenant
 

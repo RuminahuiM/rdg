@@ -374,7 +374,7 @@
       "rule": "(user.extensionAttribute1 -in [\"MGMT1\",\"MGMT2\",\"OPS\"]) -or (user.extensionAttribute2 -in [\"MGMT1\",\"MGMT2\",\"OPS\"]) -or (user.extensionAttribute3 -startsWith \"OPS\")",
       "valid": true,
       "tree": "(or (in user.extensionAttribute1 [\"MGMT1\" \"MGMT2\" \"OPS\"]) (in user.extensionAttribute2 [\"MGMT1\" \"MGMT2\" \"OPS\"]) (startsWith user.extensionAttribute3 \"OPS\"))",
-      "note": "structure of the HEKS EOP rule, invented values"
+      "note": "structure of a real EOP policy rule, invented values"
     },
     {
       "id": "real-directory-extension",

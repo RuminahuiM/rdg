@@ -11,7 +11,7 @@ Two sides, kept apart on purpose:
 | Side | Where | Who runs it | What it does |
 | --- | --- | --- | --- |
 | **Project** | Public GitHub repo, GitHub Actions | RDG maintainers | Tests every change; builds and publishes a release bundle for each version tag |
-| **Installation** | Adopter's own Azure DevOps project | Each adopter (HEKS first) | Downloads one release bundle, checks it, and deploys it with their settings file |
+| **Installation** | Adopter's own Azure DevOps project | Each adopter | Downloads one release bundle, checks it, and deploys it with their settings file |
 
 Adopters never build RDG and never need access to the project repo. One number, the RDG version, decides what runs in their tenant.
 

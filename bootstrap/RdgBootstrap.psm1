@@ -541,7 +541,7 @@ function Set-RdgAppRoleGrant {
 function Get-RdgTestUserData {
     <#
     .SYNOPSIS
-        Invented test users for a test tenant (Infrastructure design, "Testing before HEKS").
+        Invented test users for a test tenant (Infrastructure design, "Testing before production").
     .DESCRIPTION
         Deterministic: the same Count gives the same users, so reruns only add what is missing.
         Every value is invented. Every fifth user is disabled.

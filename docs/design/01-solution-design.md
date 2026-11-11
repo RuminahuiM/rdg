@@ -17,7 +17,7 @@ Entra dynamic groups do persist their members, but they cannot be mail-enabled, 
 | Sync engine | Azure Automation: two runbooks (Entra groups via Graph, Exchange groups via EXO PowerShell), user-assigned managed identity |
 | Infrastructure as code | OpenTofu + one bootstrap script for tenant grants |
 | Source control and CI/CD | Azure DevOps in the adopter's own tenant; public mirror on GitHub |
-| Audience | Public open source, HEKS as first user |
+| Audience | Public open source, built for a first production tenant |
 
 ## Design map
 
@@ -209,14 +209,14 @@ Safety brakes never fail silently: an empty rule result, a change above MaxChang
 
 ## Mini project plan
 
-Five steps, each ending in something that runs; HEKS can use the engine for the Defender case after step 3.
+Five steps, each ending in something that runs; the first adopter can use the engine for the Defender case after step 3.
 
 | Step | Scope | Done when |
 | --- | --- | --- |
 | 1. Rule engine | Repo structure, grammar spec, tokenizer + parser, evaluator incl. memberOf (existing groups and other definitions, cycle detection), Pester tests; local only, no Azure | Sample rules (incl. the EOP rule) give the expected users against a fixture user set |
 | 2. Sync core | Graph writer (Security) and EXO writer (mail-enabled security) behind the two runbook entry points, marker check, safety brakes, DryRun; config from a local JSON file | Run from a workstation keeps one test MESG in sync in a test tenant |
 | 3. Web app | Cosmos DB model, API (CRUD, validation, preview, sync now), four screens, sign-in for the IT group, audit trail; engine reads config from Cosmos DB | A definition created in the app syncs on the next local run |
-| 4. Azure deployment | OpenTofu modules, bootstrap stages 1 + 2, ci.yml and deploy.yml, metric alerts | A fresh resource group deploys from the pipeline; HEKS EOP Strict group runs in Azure |
+| 4. Azure deployment | OpenTofu modules, bootstrap stages 1 + 2, ci.yml and deploy.yml, metric alerts | A fresh resource group deploys from the pipeline; an EOP Strict policy group runs in Azure |
 | 5. v1.0 release | M365 and distribution list types, include/exclude, Exchange role group scope, README + adoption guide, GitHub release | A second person deploys it from the docs alone |
 
 Later: device groups, target groups synced from on-prem AD, opt-in Log Analytics + Application Insights, sharding for large tenants, a Container Apps hosting option for lower cost.
@@ -225,12 +225,12 @@ Later: device groups, target groups synced from on-prem AD, opt-in Log Analytics
 
 In the MVP:
 
-- **Read-only mode** (`access_mode`): an installation that can only read the tenant, enforced by permissions. HEKS is first installed read-only to test against real users, then switched to read-write. Details in Engine and Identity and Access.
+- **Read-only mode** (`access_mode`): an installation that can only read the tenant, enforced by permissions. A production tenant is first installed read-only to test against real users, then switched to read-write. Details in Engine and Identity and Access.
 - **Compare group**: a definition can name an existing group, typically the Microsoft dynamic group it replaces, and every run lists the differences. A small addition: one field, one extra Graph call, one card in the web app.
 - **Migrating Microsoft dynamic groups**: adopt one, the rule is pre-filled, and on approval the engine switches it to assigned membership and takes over. Same group ID, mail address and policy references.
-- **Scale at HEKS**: about 2,000 users, about 800 in scope, a modest number of groups. Well within one run per tick.
+- **Design scale**: a mid-sized tenant with a few thousand users, a part of them in scope, and a modest number of groups. Well within one run per tick.
 
-Test order: private tenant (writes, Exchange groups, migration) → HEKS read-only with compare groups → HEKS read-write.
+Test order: private test tenant (writes, Exchange groups, migration) → production tenant read-only with compare groups → production tenant read-write.
 
 Noted for later:
 

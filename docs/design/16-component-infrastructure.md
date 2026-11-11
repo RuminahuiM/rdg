@@ -18,7 +18,7 @@ All in one resource group per installation, except the bootstrap resources.
 
 | Resource | SKU / plan | Region | Module | Notes |
 | --- | --- | --- | --- | --- |
-| Resource group `rg-rdg-<env>` | – | West Europe (setting; HEKS uses Switzerland North) | stage 1 | Created by bootstrap so the pipeline needs no subscription rights |
+| Resource group `rg-rdg-<env>` | – | West Europe (setting, for example `switzerlandnorth`) | stage 1 | Created by bootstrap so the pipeline needs no subscription rights |
 | Resource group `rg-rdg-<env>-bootstrap` | – | same | stage 1 | State storage and state key only. Pipeline can't delete it |
 | Storage account (state) | Standard LRS, versioning and soft delete on | same | stage 1 | Shared keys off; container `tfstate` |
 | Key Vault (state key) | Standard, RBAC, purge protection | same | stage 1 | Holds the RSA key that encrypts the state |
@@ -148,9 +148,9 @@ Removing RDG: `tofu destroy` (after lifting `prevent_destroy`) and `Initialize-R
 - A second, isolated test installation (best in a separate test tenant, since groups are tenant-wide).
 - A proper keyless hosting model for the API. Running from a blob package to avoid the Azure Files key is a workaround (see CI/CD).
 
-## Testing before HEKS
+## Testing before production
 
-The first installation goes into a private test tenant, not HEKS. Same code, its own settings file, its own Azure subscription.
+The first installation goes into a private test tenant, not a production tenant. Same code, its own settings file, its own Azure subscription.
 
 - **Entra ID Free is enough.** RDG evaluates rules itself, so no Premium licence is needed; that is the point of the tool.
 - **One Exchange Online licence** (Exchange Online Plan 1, about CHF 4 per month) switches Exchange on in the tenant. Without it, distribution lists and mail-enabled security groups can't be tested. Cancel it after testing.
@@ -158,14 +158,14 @@ The first installation goes into a private test tenant, not HEKS. Same code, its
 - **Azure**: a pay-as-you-go subscription in the same tenant, with a budget alert. Expected cost is the same as the estimate in the main doc, roughly USD 26–27 per month, less if the tick is raised to 60 minutes while idle.
 - **Azure DevOps**: a free organisation or a project in an existing one, with a service connection to the test subscription.
 
-HEKS is installed only after the full flow (new group, adopt, change limit, Exchange groups, certificate renewal) has run in the test tenant.
+A production tenant is installed only after the full flow (new group, adopt, change limit, Exchange groups, certificate renewal) has run in the test tenant.
 
 ## Decisions
 
 1. **Function App on the Consumption plan (Windows)**, not Flex Consumption. The API and main docs were updated.
 2. **Stage 1 as a PowerShell script.** Stage 2 has to be PowerShell anyway (the Exchange role group can't be created in OpenTofu), so the admin needs one toolset and there is no local state file to keep safe. A script needs a bit more code for idempotency ("create if missing"), but that is a few dozen lines.
-3. **Default region West Europe.** HEKS sets `switzerlandnorth` in its settings file.
-4. **Test installation in a private tenant** first, as above. No separate test environment inside HEKS for the MVP.
+3. **Default region West Europe.** An installation can set another region, for example `switzerlandnorth`, in its settings file.
+4. **Test installation in a private tenant** first, as above. No separate test environment inside the production tenant for the MVP.
 5. **azurerm only, no azapi** (Phase 5). The provider covers every resource RDG needs.
 6. **Key Vault Certificate User at vault scope** for web and maintenance. The app Key Vault holds only the sign-in certificate, and a certificate-scoped assignment can't exist before stage 2 creates the certificate.
 7. **Marker extension derived in OpenTofu** from signin\_client\_id (extension\_\<app ID without dashes>\_rdgDefinitionId, empty while sign-in is off). Stage 2 registers the property on the sign-in app.
