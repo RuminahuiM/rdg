@@ -6,6 +6,6 @@ Important decisions for RDG are recorded here as ADRs. Each ADR describes the co
 | --- | --- | --- | --- |
 | [0001](0001-deploy-test-environment-with-github-actions.md) | Deploy the test environment with GitHub Actions | Accepted | 2026-11-08 |
 | [0002](0002-license-mit.md) | License RDG under the MIT License | Accepted | 2026-11-08 |
-| [0003](0003-branching-github-flow.md) | Use GitHub Flow for branching | Proposed | 2026-11-11 |
+| [0003](0003-branching-github-flow.md) | Use GitHub Flow for branching | Accepted | 2026-11-11 |
 
 Status values: Proposed, Accepted, Superseded, Deprecated.
