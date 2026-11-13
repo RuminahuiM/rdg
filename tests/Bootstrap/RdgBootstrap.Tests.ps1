@@ -364,14 +364,34 @@ Describe 'Get-RdgKeyCredentialPatch' {
     }
 }
 
+Describe 'Invoke-RdgGraphRequest' {
+    It 'stops on an error the invoker only writes, such as a refused call' {
+        # Invoke-MgGraphRequest reports a 403 like this, without stopping the caller.
+        $invoke = { param($Method, $Uri, $Body) Write-Error -Message "Forbidden: $Method $Uri $Body" -ErrorAction Continue; [pscustomobject]@{ id = 'x' } }
+        { Invoke-RdgGraphRequest -Method POST -Uri '/invitations' -Body @{ a = 1 } -Invoke $invoke } | Should -Throw '*Forbidden*'
+    }
+
+    It 'returns the response of a successful call' {
+        $invoke = { param($Method, $Uri, $Body) [pscustomobject]@{ id = "$Method $Uri"; body = $Body } }
+        (Invoke-RdgGraphRequest -Method GET -Uri '/me' -Invoke $invoke).id | Should -BeExactly 'GET https://graph.microsoft.com/v1.0/me'
+    }
+}
+
 Describe 'Get-RdgTestUserData' {
-    It 'creates the same invented users every time, every fifth disabled' {
-        $users = @(Get-RdgTestUserData -Count 10 -Domain 'contoso.onmicrosoft.com')
-        $users | Should -HaveCount 10
+    It 'creates the same invented users every time, every sixth disabled' {
+        $users = @(Get-RdgTestUserData -Count 12 -Domain 'contoso.onmicrosoft.com')
+        $users | Should -HaveCount 12
         $users[0].UserPrincipalName | Should -BeExactly 'rdgtest01@contoso.onmicrosoft.com'
         @($users | Where-Object { -not $_.AccountEnabled }) | Should -HaveCount 2
-        $users[4].AccountEnabled | Should -BeFalse
-        (@(Get-RdgTestUserData -Count 10 -Domain 'contoso.onmicrosoft.com'))[3].Department | Should -BeExactly $users[3].Department
+        $users[5].AccountEnabled | Should -BeFalse
+        (@(Get-RdgTestUserData -Count 12 -Domain 'contoso.onmicrosoft.com'))[3].Department | Should -BeExactly $users[3].Department
+    }
+
+    It 'gives every department the 5 active users New-RdgTestGroups.ps1 needs, with the default 30' {
+        $active = @(Get-RdgTestUserData -Count 30 -Domain 'contoso.onmicrosoft.com' | Where-Object AccountEnabled)
+        $perDepartment = @($active | Group-Object -Property Department)
+        $perDepartment | Should -HaveCount 5
+        foreach ($department in $perDepartment) { $department.Count | Should -BeGreaterOrEqual 5 -Because $department.Name }
     }
 
     It 'sets all 15 extension attributes, marking the user as test data' {

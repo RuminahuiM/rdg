@@ -179,10 +179,10 @@ RDG is installed. It changes nothing in the tenant until you switch it to read-w
 In a test tenant, create invented users first. Never run this in a production tenant; it refuses tenants with more than 100 users.
 
 ```powershell
-./bootstrap/New-RdgTestUsers.ps1 -TenantDomain <name>.onmicrosoft.com -Count 15 -GuestCount 3
+./bootstrap/New-RdgTestUsers.ps1 -TenantDomain <name>.onmicrosoft.com -Count 30 -GuestCount 3
 ```
 
-It creates `rdgtest01`–`rdgtest15` with department, city, job title and extension attributes (every fifth one disabled), and three guests without sending invitations. `-Remove` deletes them again.
+It creates `rdgtest01`–`rdgtest30` with department, city, job title and extension attributes (every sixth one disabled, so each of the five departments has five active users), and three guests without sending invitations. A new tenant can be blocked from inviting guests for a while; the script then warns and keeps the users, run it again later. `-Remove` deletes them again.
 
 Then, still read-only:
 
