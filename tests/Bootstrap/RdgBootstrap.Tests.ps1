@@ -364,6 +364,36 @@ Describe 'Get-RdgKeyCredentialPatch' {
     }
 }
 
+Describe 'Region access check' {
+    It 'builds a template with the storage account in the main region and the web app in its own' {
+        $template = Get-RdgRegionCheckTemplate -Location switzerlandnorth -SwaLocation eastus2 -StorageAccountName stx -StaticWebAppName stapp-x
+        $template.resources | Should -HaveCount 2
+        ($template.resources | Where-Object type -eq 'Microsoft.Storage/storageAccounts').location | Should -BeExactly 'switzerlandnorth'
+        ($template.resources | Where-Object type -eq 'Microsoft.Web/staticSites').location | Should -BeExactly 'eastus2'
+    }
+
+    It 'finds the refused resources in nested errors and names the setting' {
+        $message = 'The selected region is currently not accepting new customers'
+        $errors = @([pscustomobject]@{
+                Code = 'InvalidTemplateDeployment'; Message = 'policy violation'; Target = $null
+                Details = @(
+                    [pscustomobject]@{ Code = 'RequestDisallowedByAzure'; Target = 'stapp-x'; Message = $message; Details = $null }
+                    [pscustomobject]@{ Code = 'RequestDisallowedByAzure'; Target = 'stx'; Message = $message; Details = $null }
+                )
+            })
+        $denials = @(Get-RdgRegionDenial -ValidationError $errors -StorageAccountName stx -StaticWebAppName stapp-x)
+        $denials | Should -HaveCount 2
+        ($denials | Where-Object Target -eq 'stapp-x').Setting | Should -BeExactly 'swa_location'
+        ($denials | Where-Object Target -eq 'stx').Setting | Should -BeExactly 'location'
+    }
+
+    It 'reports nothing when the validation passed or failed for another reason' {
+        Should -ActualValue @(Get-RdgRegionDenial -ValidationError @() -StorageAccountName stx -StaticWebAppName stapp-x) -HaveCount 0
+        $other = @([pscustomobject]@{ Code = 'InvalidTemplate'; Message = 'x'; Target = $null; Details = $null })
+        Should -ActualValue @(Get-RdgRegionDenial -ValidationError $other -StorageAccountName stx -StaticWebAppName stapp-x) -HaveCount 0
+    }
+}
+
 Describe 'Invoke-RdgGraphRequest' {
     It 'stops on an error the invoker only writes, such as a refused call' {
         # Invoke-MgGraphRequest reports a 403 like this, without stopping the caller.

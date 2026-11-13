@@ -117,6 +117,7 @@ $settings = if ($SettingsFile) { Read-RdgSettingsFile -Path $SettingsFile } else
 if (-not $NamePrefix) { $NamePrefix = if ($settings['name_prefix']) { [string]$settings.name_prefix } else { 'rdg' } }
 if (-not $Environment) { $Environment = if ($settings['environment']) { [string]$settings.environment } else { 'prod' } }
 if (-not $Location) { $Location = if ($settings['location']) { [string]$settings.location } else { 'westeurope' } }
+$swaLocation = if ($settings['swa_location']) { [string]$settings.swa_location } else { 'westeurope' }
 $names = Get-RdgResourceName -NamePrefix $NamePrefix -Environment $Environment -SubscriptionId $SubscriptionId
 $tags = @{ app = 'rdg'; environment = $Environment; 'managed-by' = 'bootstrap' }
 $roles = @{
@@ -152,6 +153,24 @@ foreach ($name in @($names.ResourceGroup, $names.BootstrapGroup)) {
         $group = New-AzResourceGroup -Name $name -Location $Location -Tag $tags
     }
     $groups[$name] = $group
+}
+
+# --- Region access
+# Azure can close a region to subscriptions that have nothing there yet; creating a resource
+# then fails with a bare "Forbidden". Validating a template asks the same question without
+# creating anything and returns the reason, before anything else is set up.
+Write-Step "Region access ($Location, web app $swaLocation)"
+if ($groups[$names.BootstrapGroup]) {
+    $template = Get-RdgRegionCheckTemplate -Location $Location -SwaLocation $swaLocation `
+        -StorageAccountName $names.StateStorageAccount -StaticWebAppName $names.StaticWebApp
+    $validation = @(Test-AzResourceGroupDeployment -ResourceGroupName $names.BootstrapGroup -TemplateObject $template)
+    $denials = @(Get-RdgRegionDenial -ValidationError $validation -StorageAccountName $names.StateStorageAccount -StaticWebAppName $names.StaticWebApp)
+    if ($denials.Count -gt 0) {
+        $lines = $denials | ForEach-Object { "  $($_.Setting): $($_.Message)" }
+        throw ("Azure does not accept this subscription in the chosen region:`n$($lines -join "`n")`n" +
+            "Set another region in the settings file (install guide, step 1), delete the empty resource groups " +
+            "$($names.ResourceGroup) and $($names.BootstrapGroup) if 'location' changes, and run stage 1 again.")
+    }
 }
 
 # --- 3. State storage
