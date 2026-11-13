@@ -388,9 +388,9 @@ Describe 'Region access check' {
     }
 
     It 'reports nothing when the validation passed or failed for another reason' {
-        Should -ActualValue @(Get-RdgRegionDenial -ValidationError @() -StorageAccountName stx -StaticWebAppName stapp-x) -HaveCount 0
+        @(Get-RdgRegionDenial -ValidationError @() -StorageAccountName stx -StaticWebAppName stapp-x).Count | Should -Be 0
         $other = @([pscustomobject]@{ Code = 'InvalidTemplate'; Message = 'x'; Target = $null; Details = $null })
-        Should -ActualValue @(Get-RdgRegionDenial -ValidationError $other -StorageAccountName stx -StaticWebAppName stapp-x) -HaveCount 0
+        @(Get-RdgRegionDenial -ValidationError $other -StorageAccountName stx -StaticWebAppName stapp-x).Count | Should -Be 0
     }
 }
 
