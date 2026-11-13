@@ -6,15 +6,16 @@
 .DESCRIPTION
     For the test installation described in the Infrastructure design ("Testing before production"):
     users RDG Test 01..NN (rdgtestNN@<domain>) with department, job title, city, country,
-    employee ID and extensionAttribute1-3 set, extensionAttribute15 = rdg-test, every fifth one
-    disabled; and guests rdgguestNN@example.com, invited without an email. Passwords are random
+    employee ID and extensionAttribute1-3 set, extensionAttribute15 = rdg-test, every sixth one
+    disabled (with the default 30 users each of the 5 departments has 5 active users, as
+    New-RdgTestGroups.ps1 needs); and guests rdgguestNN@example.com, invited without an email. Passwords are random
     and not shown; nobody signs in as these users.
     Idempotent: existing users are left as they are. -Remove deletes them again (they stay in
     Deleted users for 30 days).
     Refuses tenants with more than 100 users unless -Force, so it isn't run against a
     production tenant by mistake.
 .EXAMPLE
-    ./bootstrap/New-RdgTestUsers.ps1 -TenantDomain contoso.onmicrosoft.com -Count 15 -GuestCount 3
+    ./bootstrap/New-RdgTestUsers.ps1 -TenantDomain contoso.onmicrosoft.com -Count 30 -GuestCount 3
 .EXAMPLE
     ./bootstrap/New-RdgTestUsers.ps1 -TenantDomain contoso.onmicrosoft.com -Remove
 #>
@@ -25,7 +26,7 @@ param(
     [string] $TenantDomain,
 
     [ValidateRange(1, 50)]
-    [int] $Count = 15,
+    [int] $Count = 30,
 
     [ValidateRange(0, 10)]
     [int] $GuestCount = 3,
@@ -99,18 +100,28 @@ foreach ($user in $users) {
 }
 
 $invited = 0
+$failed = 0
 foreach ($guest in $guests) {
     $filter = [uri]::EscapeDataString("mail eq '$($guest.Email)'")
     $existing = @((Invoke-RdgGraphRequest -Method GET -Uri "/users?`$filter=$filter&`$select=id").value)
     if ($existing.Count -gt 0) { continue }
     if (-not $PSCmdlet.ShouldProcess($guest.Email, 'Invite test guest (no email is sent)')) { continue }
-    [void](Invoke-RdgGraphRequest -Method POST -Uri '/invitations' -Body @{
-            invitedUserEmailAddress = $guest.Email
-            invitedUserDisplayName  = $guest.DisplayName
-            inviteRedirectUrl       = 'https://myapps.microsoft.com'
-            sendInvitationMessage   = $false
-        })
-    $invited++
+    # Guests are optional test data: a refused invitation (new tenants can be blocked from
+    # inviting for a while) is reported, the users above stay.
+    try {
+        [void](Invoke-RdgGraphRequest -Method POST -Uri '/invitations' -Body @{
+                invitedUserEmailAddress = $guest.Email
+                invitedUserDisplayName  = $guest.DisplayName
+                inviteRedirectUrl       = 'https://myapps.microsoft.com'
+                sendInvitationMessage   = $false
+            })
+        $invited++
+    } catch {
+        $failed++
+        Write-Warning -Message "Could not invite $($guest.Email): $($_.Exception.Message)"
+    }
 }
 
-Write-Information -MessageData "Created $created test user(s) and invited $invited guest(s) in $TenantDomain." -InformationAction Continue
+$summary = "Created $created test user(s) and invited $invited guest(s) in $TenantDomain."
+if ($failed -gt 0) { $summary += " $failed guest invitation(s) failed, see the warnings above; run the script again later." }
+Write-Information -MessageData $summary -InformationAction Continue

@@ -436,15 +436,28 @@ function Invoke-RdgGraphRequest {
         }
     )
 
+    # Invoke-MgGraphRequest reports a failed call (e.g. 403) as a non-terminating error even with
+    # -ErrorAction Stop, so the caller would carry on as if it had worked. Any error record
+    # from the invoker therefore ends the call here.
+    $call = {
+        param($CallMethod, $CallUri, $CallBody)
+        $result = $null
+        foreach ($record in @(& $Invoke $CallMethod $CallUri $CallBody 2>&1)) {
+            if ($record -is [System.Management.Automation.ErrorRecord]) { throw $record }
+            $result = $record
+        }
+        $result
+    }
+
     $full = if ($Uri -match '^https://') { $Uri } else { "https://graph.microsoft.com/v1.0$Uri" }
     $payload = if ($null -ne $Body) { $Body | ConvertTo-Json -Depth 10 -Compress } else { $null }
-    $response = & $Invoke $Method $full $payload
+    $response = & $call $Method $full $payload
     if (-not $All) { return $response }
     $items = [System.Collections.Generic.List[object]]::new()
     while ($null -ne $response) {
         foreach ($item in @($response.value)) { if ($null -ne $item) { $items.Add($item) } }
         $next = if ($response.PSObject.Properties['@odata.nextLink']) { $response.'@odata.nextLink' } else { $null }
-        $response = if ($next) { & $Invoke 'GET' $next $null } else { $null }
+        $response = if ($next) { & $call 'GET' $next $null } else { $null }
     }
     $items.ToArray()
 }
@@ -574,7 +587,9 @@ function Get-RdgTestUserData {
             DisplayName         = "RDG Test $n"
             MailNickname        = "rdgtest$n"
             UserPrincipalName   = "rdgtest$n@$Domain"
-            AccountEnabled      = ($i % 5) -ne 0
+            # Every sixth user is disabled. With 5 departments that spreads the disabled users over
+            # all of them, so each department keeps 5 active users with the default 30.
+            AccountEnabled      = ($i % 6) -ne 0
             Department          = $departments[$i % $departments.Count]
             JobTitle            = $titles[$i % $titles.Count]
             City                = $cities[$i % $cities.Count]

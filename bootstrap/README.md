@@ -80,11 +80,11 @@ with `tofu destroy`.
 ## Test users
 
 ```powershell
-./bootstrap/New-RdgTestUsers.ps1 -TenantDomain contoso.onmicrosoft.com -Count 15 -GuestCount 3
+./bootstrap/New-RdgTestUsers.ps1 -TenantDomain contoso.onmicrosoft.com -Count 30 -GuestCount 3
 ```
 
 For a test tenant only: invented cloud-only users `rdgtest01..` with department, city, job title
-and extension attributes, every fifth disabled, and guests `rdgguest01@example.com` invited
+and extension attributes, every sixth disabled, and guests `rdgguest01@example.com` invited
 without an email. Refuses tenants with more than 100 users unless `-Force`. `-Remove` deletes
 them again.
 
