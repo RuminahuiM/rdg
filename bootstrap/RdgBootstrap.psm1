@@ -436,30 +436,49 @@ function Invoke-RdgGraphRequest {
         }
     )
 
-    # Invoke-MgGraphRequest reports a failed call (e.g. 403) as a non-terminating error even with
-    # -ErrorAction Stop, so the caller would carry on as if it had worked. Any error record
-    # from the invoker therefore ends the call here.
-    $call = {
-        param($CallMethod, $CallUri, $CallBody)
-        $result = $null
-        foreach ($record in @(& $Invoke $CallMethod $CallUri $CallBody 2>&1)) {
-            if ($record -is [System.Management.Automation.ErrorRecord]) { throw $record }
-            $result = $record
-        }
-        $result
-    }
-
     $full = if ($Uri -match '^https://') { $Uri } else { "https://graph.microsoft.com/v1.0$Uri" }
     $payload = if ($null -ne $Body) { $Body | ConvertTo-Json -Depth 10 -Compress } else { $null }
-    $response = & $call $Method $full $payload
+    $response = Invoke-RdgGraphCall -Invoke $Invoke -Method $Method -Uri $full -Body $payload
     if (-not $All) { return $response }
     $items = [System.Collections.Generic.List[object]]::new()
     while ($null -ne $response) {
         foreach ($item in @($response.value)) { if ($null -ne $item) { $items.Add($item) } }
         $next = if ($response.PSObject.Properties['@odata.nextLink']) { $response.'@odata.nextLink' } else { $null }
-        $response = if ($next) { & $call 'GET' $next $null } else { $null }
+        $response = if ($next) { Invoke-RdgGraphCall -Invoke $Invoke -Method 'GET' -Uri $next -Body $null } else { $null }
     }
     $items.ToArray()
+}
+
+function Invoke-RdgGraphCall {
+    <#
+    .SYNOPSIS
+        Runs one call through the invoker and stops on any error it writes.
+    .DESCRIPTION
+        Invoke-MgGraphRequest reports a failed call (e.g. 403) as a non-terminating error even
+        with -ErrorAction Stop, so the caller would carry on as if it had worked. Any error
+        record from the invoker therefore ends the call here.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [scriptblock] $Invoke,
+
+        [Parameter(Mandatory)]
+        [string] $Method,
+
+        [Parameter(Mandatory)]
+        [string] $Uri,
+
+        [AllowNull()]
+        [object] $Body
+    )
+
+    $result = $null
+    foreach ($record in @(& $Invoke $Method $Uri $Body 2>&1)) {
+        if ($record -is [System.Management.Automation.ErrorRecord]) { throw $record }
+        $result = $record
+    }
+    $result
 }
 
 function Get-RdgServicePrincipal {

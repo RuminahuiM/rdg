@@ -367,12 +367,12 @@ Describe 'Get-RdgKeyCredentialPatch' {
 Describe 'Invoke-RdgGraphRequest' {
     It 'stops on an error the invoker only writes, such as a refused call' {
         # Invoke-MgGraphRequest reports a 403 like this, without stopping the caller.
-        $invoke = { param($Method, $Uri, $Body) Write-Error -Message 'Forbidden' -ErrorAction Continue; [pscustomobject]@{ id = 'x' } }
+        $invoke = { param($Method, $Uri, $Body) Write-Error -Message "Forbidden: $Method $Uri $Body" -ErrorAction Continue; [pscustomobject]@{ id = 'x' } }
         { Invoke-RdgGraphRequest -Method POST -Uri '/invitations' -Body @{ a = 1 } -Invoke $invoke } | Should -Throw '*Forbidden*'
     }
 
     It 'returns the response of a successful call' {
-        $invoke = { param($Method, $Uri, $Body) [pscustomobject]@{ id = "$Method $Uri" } }
+        $invoke = { param($Method, $Uri, $Body) [pscustomobject]@{ id = "$Method $Uri"; body = $Body } }
         (Invoke-RdgGraphRequest -Method GET -Uri '/me' -Invoke $invoke).id | Should -BeExactly 'GET https://graph.microsoft.com/v1.0/me'
     }
 }
