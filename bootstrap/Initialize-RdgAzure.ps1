@@ -275,15 +275,27 @@ $result = [pscustomobject]@{
     BackendKey           = $names.StateKey
     StateKeyVaultName    = $names.StateKeyVault
 }
-Write-Information -InformationAction Continue -MessageData @"
-
-Stage 1 done.
+# The summary fits the mode: -LocalOnly has no service connection and no pipeline, and -WhatIf
+# changed nothing.
+$heading = if ($WhatIfPreference) { 'Stage 1 (WhatIf): nothing was changed. The values below are what a real run uses.' } else { 'Stage 1 done.' }
+$connection = if ($LocalOnly) { '' } else {
+    @"
 
 Azure DevOps service connection (workload identity federation, manual):
   Subscription ID   $SubscriptionId
   Tenant ID         $tenantId
   Client ID         $pipelineAppId
+"@
+}
+$next = if ($LocalOnly) {
+    'Next: build or unpack the release bundle and run deploy/Deploy-Rdg.ps1 (Plan, Apply, DeployCode, DeployWeb, SmokeTest), then bootstrap/Initialize-RdgTenant.ps1.'
+} else {
+    'Next: run the pipeline once (sign-in stays off), then bootstrap/Initialize-RdgTenant.ps1.'
+}
+Write-Information -InformationAction Continue -MessageData @"
 
+$heading
+$connection
 OpenTofu backend (tofu init -backend-config=...):
   resource_group_name  = $($names.BootstrapGroup)
   storage_account_name = $($names.StateStorageAccount)
@@ -294,6 +306,6 @@ Settings file:
   state_key_vault_name  = "$($names.StateKeyVault)"
   pipeline_principal_id = "$PipelinePrincipalId"
 
-Next: run the pipeline once (sign-in stays off), then bootstrap/Initialize-RdgTenant.ps1.
+$next
 "@
 $result
