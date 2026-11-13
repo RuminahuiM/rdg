@@ -144,6 +144,105 @@ function Read-RdgSettingsFile {
 
 #region Permissions
 
+function Get-RdgRegionCheckTemplate {
+    <#
+    .SYNOPSIS
+        A deployment template for validation only: one storage account in the main region and
+        one Static Web App in the web app region.
+    .DESCRIPTION
+        Azure can close a region to subscriptions that have nothing there yet (West Europe in
+        2026). Creating a resource then fails with a bare "Forbidden". Validating this template
+        (Test-AzResourceGroupDeployment) asks Azure the same question without creating anything
+        and returns the reason. Nothing from this template is ever deployed.
+    .EXAMPLE
+        Get-RdgRegionCheckTemplate -Location switzerlandnorth -SwaLocation westeurope -StorageAccountName strdgprodbs1a2b -StaticWebAppName stapp-rdg-prod
+    #>
+    [CmdletBinding()]
+    [OutputType([hashtable])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $Location,
+
+        [Parameter(Mandatory)]
+        [string] $SwaLocation,
+
+        [Parameter(Mandatory)]
+        [string] $StorageAccountName,
+
+        [Parameter(Mandatory)]
+        [string] $StaticWebAppName
+    )
+
+    @{
+        '$schema'      = 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
+        contentVersion = '1.0.0.0'
+        resources      = @(
+            @{
+                type       = 'Microsoft.Storage/storageAccounts'
+                apiVersion = '2023-05-01'
+                name       = $StorageAccountName
+                location   = $Location
+                sku        = @{ name = 'Standard_LRS' }
+                kind       = 'StorageV2'
+                properties = @{}
+            }
+            @{
+                type       = 'Microsoft.Web/staticSites'
+                apiVersion = '2023-01-01'
+                name       = $StaticWebAppName
+                location   = $SwaLocation
+                sku        = @{ name = 'Standard'; tier = 'Standard' }
+                properties = @{}
+            }
+        )
+    }
+}
+
+function Get-RdgRegionDenial {
+    <#
+    .SYNOPSIS
+        The resources Azure refuses for the region, out of the errors of a deployment validation.
+    .DESCRIPTION
+        Walks the error tree (an error has Code, Message, Target and nested Details) and returns
+        every RequestDisallowedByAzure entry with the setting that chooses its region.
+    .EXAMPLE
+        Get-RdgRegionDenial -ValidationError $errors -StorageAccountName $names.StateStorageAccount -StaticWebAppName $names.StaticWebApp
+    #>
+    [CmdletBinding()]
+    [OutputType([pscustomobject[]])]
+    param(
+        [AllowNull()]
+        [AllowEmptyCollection()]
+        [object[]] $ValidationError,
+
+        [Parameter(Mandatory)]
+        [string] $StorageAccountName,
+
+        [Parameter(Mandatory)]
+        [string] $StaticWebAppName
+    )
+
+    $denials = [System.Collections.Generic.List[object]]::new()
+    $pending = [System.Collections.Generic.Queue[object]]::new()
+    foreach ($item in @($ValidationError)) { if ($null -ne $item) { $pending.Enqueue($item) } }
+    while ($pending.Count -gt 0) {
+        $item = $pending.Dequeue()
+        $code = if ($item.PSObject.Properties['Code']) { [string]$item.Code } else { '' }
+        if ($code -eq 'RequestDisallowedByAzure') {
+            $target = if ($item.PSObject.Properties['Target']) { [string]$item.Target } else { '' }
+            $setting = switch ($target) {
+                $StorageAccountName { 'location' }
+                $StaticWebAppName { 'swa_location' }
+                default { 'location or swa_location' }
+            }
+            $denials.Add([pscustomobject]@{ Setting = $setting; Target = $target; Message = [string]$item.Message })
+        }
+        $details = if ($item.PSObject.Properties['Details']) { $item.Details } else { $null }
+        foreach ($detail in @($details)) { if ($null -ne $detail) { $pending.Enqueue($detail) } }
+    }
+    $denials.ToArray()
+}
+
 function Get-RdgGraphPermission {
     <#
     .SYNOPSIS
@@ -675,6 +774,8 @@ Export-ModuleMember -Function @(
     'Get-RdgNameSuffix'
     'Get-RdgResourceName'
     'Read-RdgSettingsFile'
+    'Get-RdgRegionCheckTemplate'
+    'Get-RdgRegionDenial'
     'Get-RdgGraphPermission'
     'Get-RdgExchangeRole'
     'Get-RdgPipelineRole'

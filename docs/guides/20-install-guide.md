@@ -46,10 +46,12 @@ Fill these now:
 
 - `environment`, `name_prefix` – the two names you picked
 - `location` – region for everything except the web app (for example `switzerlandnorth`)
-- `swa_location` – region for the web app; Static Web Apps isn't offered in Switzerland, so `westeurope`
+- `swa_location` – region for the web app; Static Web Apps is offered in five regions only (see the Settings reference). It holds the web app's files, no directory data; the API and the database are in `location`
 - `tenant_domain` – the initial domain, `<name>.onmicrosoft.com`
 - `alert_emails` – who gets the alerts (a distribution list works)
 - `access_mode` – leave `read-only`
+
+**Regions and new subscriptions.** Azure can close a region to subscriptions that have nothing there yet. In 2026 this applies to West Europe: creating a resource fails with "The selected region is currently not accepting new customers". Stage 1 checks both regions before it creates anything and names the setting to change. Pick another region then (for `swa_location` one of the other four); Microsoft grants access to a closed region only on request and with a reason.
 
 Leave these empty; later steps print them:
 
@@ -256,6 +258,7 @@ The settings file holds only what Azure needs to know. Organisation settings suc
 
 | Symptom | Likely cause | Fix |
 | --- | --- | --- |
+| Stage 1 stops with "Azure does not accept this subscription in the chosen region" | The region is closed to new subscriptions (West Europe in 2026) | Set another `location` or `swa_location` (step 1). If `location` changes, delete the two empty resource groups first, then rerun stage 1 |
 | Plan fails with `AADSTS700213` or "no matching federated identity" | Issuer or subject of the service connection differ from what stage 1 registered | Rerun stage 1 with the values Azure DevOps shows now; it adds the credential |
 | Plan fails reading state: 403 on the storage account or the key | Role assignments from stage 1 not active yet, or the wrong service connection | Wait 10 minutes and rerun; check `serviceConnectionId` |
 | Plan says a required variable is missing | `state_key_vault_name` or `tenant_domain` empty | Fill them from stage 1 and your tenant |
